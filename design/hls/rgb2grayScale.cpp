@@ -1,15 +1,25 @@
+// -------------------------------------------------------------------------
+//       DCU Custom RGB to Grayscale Filter
+//
+//  Author:       Cathal Garry
+//  Description:  This is a custom RGB to Grayscale filter for
+//                720P images. It contains an input and output AXI stream
+//                ports.
+// -------------------------------------------------------------------------
+
 #include "rgb2grayScale.h"
-#include <iostream>
-#include <stdio.h>
+
 
 using namespace std;
 
 
 void rgb2grayScale_filter(AXI_STREAM& INPUT_STREAM, AXI_STREAM& OUTPUT_STREAM)
 {
-	//#pragma HLS INTERFACE axis depth=10000 port=INPUT_STREAM bundle=VIDEO_IN
-	//#pragma HLS INTERFACE axis depth=10000 port=OUTPUT_STREAM bundle=VIDEO_OUT
-    #pragma HLS dataflow
+	// Removes ap_ctrl interface
+	#pragma HLS INTERFACE ap_ctrl_none port=return
+
+	// Synthesis data flow improvement
+        #pragma HLS dataflow
 
 	const int rows = MAX_HEIGHT;
 	const int cols = MAX_WIDTH;
