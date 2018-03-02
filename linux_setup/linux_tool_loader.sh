@@ -18,7 +18,7 @@ echo "###### Getting Zybo Setup Files ######"
 
 wget -P ./ "https://raw.githubusercontent.com/ucb-bar/fpga-zynq/master/zybo/src/xml/ZYBO_zynq_def.xml"
 wget -P ./ "https://raw.githubusercontent.com/Digilent/ZYBO/master/Resources/XDC/ZYBO_Master.xdc"
-wget -P ./ "https://github.com/SDU-Embedded/linux_zynq/blob/master/linux_zybo/devicetree.dts"
+#wget -P ./ "https://github.com/SDU-Embedded/linux_zynq/blob/master/linux_zybo/devicetree.dts"
 wget -P ./ "http://releases.linaro.org/debian/images/developer-armhf/17.02/linaro-jessie-developer-20161117-32.tar.gz"
 
 echo "###### Building U-Boot Image ######"
@@ -38,6 +38,7 @@ cd tools
 export PATH=`pwd`:$PATH
 cd ..
 mv u-boot u-boot.elf
+cd ../
 
 echo "###### Building Linux Kernel Image ######"
 
@@ -55,6 +56,8 @@ make ARCH=arm UIMAGE_LOADADDR=0x8000 uImage
 ## optional build kernal modules
 make ARCH=arm modules
 sudo make ARCH=arm INSTALL_MOD_PATH=mnt/ modules_install
+cd ../
+
 
 echo "###### Cloning Device tree ######"
 git clone https://github.com/SDU-Embedded/device-tree-xlnx.git
