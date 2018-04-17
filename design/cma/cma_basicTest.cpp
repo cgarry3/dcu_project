@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<lib_xlnkcma.h>
 
 	int main()
 	{
