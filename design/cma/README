@@ -1,0 +1,2 @@
+## To compile cma program
+g++ -Wall -g -I /home/linaro/work/pynq_libs/PYNQ/sdbuild/packages/libsds/xlnkutils  test.cpp -o test -L /home/linaro/work/pynq_libs/PYNQ/sdbuild/packages/libsds/xlnkutils -l sds_lib
