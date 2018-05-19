@@ -1,5 +1,5 @@
 extern "C" {
-     #include "/home/linaro/work/pynq_libs/PYNQ/sdbuild/packages/libsds/xlnkuti$
+     #include "/home/linaro/work/pynq_libs/PYNQ/sdbuild/packages/libsds/xlnkutils/libxlnk_cma.h"
 }
 
 #include<stdio.h>
