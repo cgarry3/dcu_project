@@ -9,6 +9,7 @@ extern "C" {
 #include <termios.h>
 #include <sys/mman.h>
 #include <string.h>
+#include <iostream>
 
 using namespace cv;
 
@@ -117,6 +118,9 @@ int main() {
     uint32_t    size_word  = (uint32_t)sizeof(unsigned char)*width*height*3;
     uint32_t    cache_mode = (uint32_t)(0);
 
+    std::cout << "Number bytes per word: " <<   static_cast<int>(size_word) << std::endl;
+    std::cout << "Number bytes per image: " << (sizeof(unsigned char)*width*height*3) << std::endl;
+
     // image pointers
     void* pData = (void*)inImg.data;
     void* dData = (void*)outImg.data;
@@ -184,8 +188,10 @@ int main() {
 
     printf("Writing S2MM transfer length...\n");
     dma_set(virtual_address, S2MM_LENGTH, static_cast<int>(size_word));
+    //dma_set(virtual_address, S2MM_LENGTH, 150);
     dma_s2mm_status(virtual_address);
-
+    std::cout << "length: " << dma_get(virtual_address, S2MM_LENGTH) << std::endl;
+    
     printf("Writing MM2S transfer length...\n");
     dma_set(virtual_address, MM2S_LENGTH, static_cast<int>(size_word));
     dma_mm2s_status(virtual_address);
@@ -217,6 +223,5 @@ int main() {
     cma_free(dest);
     printf("Contiugous memory space is now free up!!!\n");
 
-
-
 }
+
