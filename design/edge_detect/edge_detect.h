@@ -6,5 +6,6 @@ void edge_detect(stream_t& stream_in, stream_t& stream_out);
 #define MAX_HEIGHT 720
 #define MAX_WIDTH 1280
 typedef hls::Mat<MAX_HEIGHT, MAX_WIDTH, HLS_8UC3> rgb_img_t;
-#define INPUT_IMAGE "rover.bmp"
-#define OUTPUT_IMAGE "rover_output.bmp"
+#define INPUT_IMAGE "C:\\Users\\cgarry\\Google Drive\\dcu_masters\\project\\design\\image_algorthim\\data\\M6_Traffic.jpg"
+#define OUTPUT_IMAGE "C:\\Users\\cgarry\\Google Drive\\dcu_masters\\project\\design\\image_algorthim\\data\\edge_detect.jpg"
+
