@@ -16,10 +16,10 @@ using namespace std;
 #define CLIENTID        "rpi1"
 #define AUTHMETHOD      "garryc3"
 #define AUTHTOKEN       "password"
-#define TOPIC_TEMP      "ee513/temp"
+#define TOPIC           "ee580/congest"
 #define QOS             2
 #define TIMEOUT         10000L
-#define LASTWILLTOPIC   "/ee513/temp"
+#define LASTWILLTOPIC   "/ee580/congest"
 #define LASTWILLQOS     2
 #define LASTWILLMESS    "unexcepted exit"
 #define LASTWILLRETAIN  false
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
            MQTTClient_publishMessage(client, TOPIC_TEMP, &pubmsg, &token);
            cout << "Waiting for up to " << (int)(TIMEOUT/1000) <<
                 " seconds for publication of " << "hello from the zybo board" <<
-                " \non topic " << TOPIC_TEMP << " for ClientID: " << CLIENTID << endl;
+                " \non topic " << TOPIC << " for ClientID: " << CLIENTID << endl;
            rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
            cout << "Message with token " << (int)token << " delivered." << endl;
            usleep(200000);
