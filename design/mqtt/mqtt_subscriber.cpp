@@ -77,6 +77,7 @@ void updateMotorWaySpeed()
         default: motorway_speed = 80;  // default
     }
     
+    cout << "New motorway speed: " << motorway_speed << endl;
 }
 
 // ---------------------------------------------
@@ -299,7 +300,7 @@ int main(int argc, char* argv[]) {
     
     // default of 10 cars starting off
     std::fill(congestionLevelResults, congestionLevelResults + SAMPLE_SIZE, DDEFAULT_CONGESTION_LEVEL);
-    
+    cout << "Current motorway speed: " << motorway_speed << endl;
     
 
     // ---------------------------------------
