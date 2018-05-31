@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
            pubmsg.payloadlen = message_str.str().length();
            pubmsg.qos = QOS;
            pubmsg.retained = 0;
-           MQTTClient_publishMessage(client, TOPIC_TEMP, &pubmsg, &token);
+           MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
            cout << "Waiting for up to " << (int)(TIMEOUT/1000) <<
                 " seconds for publication of " << "hello from the zybo board" <<
                 " \non topic " << TOPIC << " for ClientID: " << CLIENTID << endl;
