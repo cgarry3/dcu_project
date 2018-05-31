@@ -23,22 +23,30 @@ using namespace std;
 #define GPIO        "/sys/class/gpio/"
 #define GPIO_NO     23
 
-// car sample size
-// a sample is recieved every second
-#define CAR_SAMPLE_SIZE 120
+// default congestion leve
+#define DDEFAULT_CONGESTION_LEVEL 1
+
+// sample of congestion results
+// four samples gives us an estimate over 2 minutes
+#define SAMPLE_SIZE 4
 
 volatile MQTTClient_deliveryToken deliveredtoken;
 
 // ---------------------------------------------
-// Cars passing
-// - array of 100 of cars passing
+// Congestion of motorway
+// a sample is recieved every 30 second
+// 1 = quick flow low traffic (120kph)
+// 2 = quick flow high traffic (100kph)
+// 3 = low flow high traffic (80kph)
+// 4 = low flow low traffic (120kph)
 // ---------------------------------------------
 
-int cars_passing[CAR_SAMPLE_SIZE];
+int congestionLevelResults[SAMPLE_SIZE];
 
 // ---------------------------------------------
 // Motorway speed(KMPH)
-// - based on the number of cars passing by
+// - based on the average of the congestion 
+//   level over two minutes
 // ---------------------------------------------
 
 int motorway_speed = 100; 
@@ -52,26 +60,21 @@ void updateMotorWaySpeed()
     // initial average
     int average = 0;
     
-    for(int x=0; x<CAR_SAMPLE_SIZE; x++)
+    for(int x=0; x<SAMPLE_SIZE; x++)
     {
-        average = cars_passing[x] + average;
+        average = congestionLevelResults[x] + average;
     }
     
     // final average
-    average = (average/CAR_SAMPLE_SIZE);
+    average = (average/SAMPLE_SIZE);
     
     // new motorway speed based on the average
-    if(average>10){
-          motorway_speed = 120;
-    }
-    else if(average>5 && average<10){
-          motorway_speed = 100;
-    }
-    else if(average>1 && average<5){
-          motorway_speed = 80;
-    }
-    else{
-          motorway_speed = 80;
+    switch(1) {
+        case 1 : motorway_speed = 120; // quick flow low traffic
+        case 2 : motorway_speed = 100; // quick flow high traffic
+        case 3 : motorway_speed = 80;  // low flow high traffic
+        case 4 : motorway_speed = 120; // low flow low traffic
+        default: motorway_speed = 80;  // default
     }
     
 }
@@ -80,16 +83,16 @@ void updateMotorWaySpeed()
 // Update number of cars
 // ---------------------------------------------
 
-void updateCarNumbers(int newCount)
+void updateCongestionResult(int newResult)
 {
-   for(int x=1; x<CAR_SAMPLE_SIZE; x++)
+   for(int x=1; x<SAMPLE_SIZE; x++)
    {
        // shift everything to the left by one
-       cars_passing[x] = cars_passing[x-1]
+       congestionLevelResults[x] = congestionLevelResults[x-1]
    }
    
    // load new value
-   cars_passing[0] = newCount;
+   congestionLevelResults[0] = newResult;
 }
 
 // ---------------------------------------------
@@ -262,7 +265,7 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
         turnOnLed();
     } 
     else {
-        updateCarNumbers(data);
+        updateCongestionResult(data);
         updateMotorWaySpeed();
     }
     
@@ -295,7 +298,7 @@ int main(int argc, char* argv[]) {
     // ---------------------------------------
     
     // default of 10 cars starting off
-    std::fill(cars_passing, cars_passing + CAR_SAMPLE_SIZE, 10);
+    std::fill(congestionLevelResults, congestionLevelResults + SAMPLE_SIZE, DDEFAULT_CONGESTION_LEVEL);
     
     
 
@@ -331,4 +334,3 @@ int main(int argc, char* argv[]) {
     MQTTClient_destroy(&client);
     return rc;
 }
-
