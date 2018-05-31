@@ -25,7 +25,12 @@ using namespace std;
 #define LASTWILLRETAIN  false
 #define NUM_PUBLISHS    500
 
-
+// returns a random number ranging from min to max
+int randNum(int min, int max)
+{
+    int x = rand() % min +  max;
+    return x;
+}
 
 int main(int argc, char* argv[]) {
     
@@ -67,13 +72,14 @@ int main(int argc, char* argv[]) {
    // Publishing Messages
    // ---------------------------------------------
    
-   for(int x=0; x<NUM_PUBLISHS; x=x+1) {           
+   for(int x=0; x<NUM_PUBLISHS; x=x+1) {        
+   
            // ------------------------------------------
-           // Sending the Temperature + 2sec sleep
+           // Sending a random congestion result to subsciber
            // ------------------------------------------
            
            stringstream message_str;
-           message_str << "{\"d\":{\"Number of Vehicles\":" << "12" << "}}" << '\n';
+           message_str << "{\"d\":{\"Number of Vehicles\":" << randNum(1,4) << "}}" << '\n';
            pubmsg.payload = (char*) message_str.str().c_str();
            pubmsg.payloadlen = message_str.str().length();
            pubmsg.qos = QOS;
