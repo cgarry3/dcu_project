@@ -109,6 +109,25 @@ bool isFloat( string myString ) {
     return iss.eof() && !iss.fail(); 
 }
 
+// ---------------------------------------------
+// Used to split strings
+// ---------------------------------------------
+
+string split(string input_string, string delimiter, int sel_split) {
+      string token;
+      int split_no=0;
+      int del;
+
+      while (split_no < sel_split) {
+                del = input_string.find(delimiter);
+                token = input_string.substr(0, del);
+                input_string.erase(0, del + delimiter.length());
+                split_no += 1;
+      }
+      return input_string.substr(0, input_string.find(delimiter));
+}
+
+
 //---------------------------------------------
 // Setup GPIO 23
 // -------------------------------------------
@@ -119,9 +138,9 @@ void setupGPIO(){
     
         string export_str = "/sys/class/gpio/export";
         ofstream exportgpio(export_str.c_str());
-        if (exportgpio < 0){
-        cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
-        }
+        //if (exportgpio < 0){
+        //cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
+        //}
 
         exportgpio << GPIO_NO ; //write GPIO number to export
         exportgpio.close(); //close export file
@@ -132,9 +151,9 @@ void setupGPIO(){
         
         export_str = gpioPath + "direction";
         ofstream gpio_direction(export_str.c_str());
-        if (gpio_direction < 0){
-        cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
-        }
+        //if (gpio_direction < 0){
+        //cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
+        //}
 
         gpio_direction << "out" ; //write GPIO number to export
         gpio_direction.close(); //close export file   
@@ -160,9 +179,9 @@ void turnOnLed() {
         
         string value_str = gpioPath + "value";
         ofstream gpio_value(value_str.c_str());
-        if (gpio_value < 0){
-        cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
-        }
+        //if (gpio_value < 0){
+        //cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
+        //}
 
         gpio_value << 1 ; //write GPIO number to export
         gpio_value.close(); //close export file
@@ -189,12 +208,17 @@ void turnOffLed() {
         
         string value_str = gpioPath + "value";
         ofstream gpio_value(value_str.c_str());
-        if (gpio_value < 0){
-        cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
-        }
+        //if (gpio_value < 0){
+        //cout << " OPERATION FAILED: Unable to export GPIO"<< GPIO_NO <<" ."<< endl;
+        //}
 
         gpio_value << 0 ; //write GPIO number to export
         gpio_value.close(); //close export file
+}
+
+void delivered(void *context, MQTTClient_deliveryToken dt) {
+    printf("Message with token value %d delivery confirmed\n", dt);
+    deliveredtoken = dt;
 }
 
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
