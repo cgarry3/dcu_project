@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
    // ---------------------------------------------
    // creating last will
    // ---------------------------------------------
-   
+  
    MQTTClient_willOptions will_opts = MQTTClient_willOptions_initializer;
    will_opts.topicName   = LASTWILLTOPIC;
    will_opts.qos         = LASTWILLQOS;
@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
    // Creating MQTT Publisher
    // --------------------------------------------- 
    
+   char str_payload[100];          // Set your max message size here
    MQTTClient client;
    MQTTClient_connectOptions opts = MQTTClient_connectOptions_initializer;
    MQTTClient_message pubmsg = MQTTClient_message_initializer;
@@ -78,12 +79,13 @@ int main(int argc, char* argv[]) {
            // Sending a random congestion result to subsciber
            // ------------------------------------------
            
-           stringstream message_str;
-           message_str << "{\"d\":{\"Number of Vehicles\":" << randNum(1,4) << "}}" << '\n';
-           pubmsg.payload = (char*) message_str.str().c_str();
-           pubmsg.payloadlen = message_str.str().length();
+           // fixed code
+           sprintf(str_payload, "{\"d\":{\"Number of Vehicles\": %f }}", randNum(1,4));
+           pubmsg.payload = str_payload;
+           pubmsg.payloadlen = strlen(str_payload);
            pubmsg.qos = QOS;
            pubmsg.retained = 0;
+        
            MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
            cout << "Waiting for up to " << (int)(TIMEOUT/1000) <<
                 " seconds for publication of " << "hello from the zybo board" <<
