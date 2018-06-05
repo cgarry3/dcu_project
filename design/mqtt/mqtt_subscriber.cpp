@@ -89,7 +89,7 @@ void updateCongestionResult(int newResult)
    for(int x=1; x<SAMPLE_SIZE; x++)
    {
        // shift everything to the left by one
-       congestionLevelResults[x] = congestionLevelResults[x-1]
+       congestionLevelResults[x] = congestionLevelResults[x-1];
    }
    
    // load new value
