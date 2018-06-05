@@ -110,6 +110,18 @@ bool isFloat( string myString ) {
 }
 
 // ---------------------------------------------
+// Used to indicate if the string is a 
+// number or not, returns a boolean value
+// ---------------------------------------------
+
+bool is_number(const std::string& s)
+{
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && std::isdigit(*it)) ++it;
+    return !s.empty() && it == s.end();
+}
+
+// ---------------------------------------------
 // Used to split strings
 // ---------------------------------------------
 
@@ -230,7 +242,7 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     int      i;              // Used in for loop
     bool     last_will;      // Indicates if it is a last will packet
     char*    payloadptr;     // Used to contain payload
-    bool     isFloatNumber;  // Indicates if it is a float number or not
+    bool     isNumber;       // Indicates if it is a number or not
     float    data;           // packet data
     string   topic;          // packet topic 
     
@@ -267,9 +279,9 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     // Checking to see if the data is corrupted
     // -------------------------------------------------------
     
-    isFloatNumber = isFloat(mqtt_message3);
+    isNumber = is_number(mqtt_message3);
 
-    if(isFloatNumber==1) {
+    if(isNumber==1) {
             data = stof(mqtt_message3);
             topic += split(topicName, "/",1);
             cout << "Topic: " << topic << "\nData: " << data << "\n";
