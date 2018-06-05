@@ -28,8 +28,8 @@ using namespace std;
 // returns a random number ranging from min to max
 int randNum(int min, int max)
 {
-    int x = rand() % min +  max;
-    return x;
+    int randNum = rand()%(max-min + 1) + min;
+    return randNum;
 }
 
 int main(int argc, char* argv[]) {
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
            // ------------------------------------------
            
            // fixed code
-           sprintf(str_payload, "{\"d\":{\"Number of Vehicles\": %f }}", randNum(1,4));
+           sprintf(str_payload, "{\"d\":{\"Number of Vehicles\": %d }}", randNum(1,4));
            pubmsg.payload = str_payload;
            pubmsg.payloadlen = strlen(str_payload);
            pubmsg.qos = QOS;
