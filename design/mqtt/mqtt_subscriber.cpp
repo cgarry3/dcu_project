@@ -114,11 +114,11 @@ bool isFloat( string myString ) {
 // number or not, returns a boolean value
 // ---------------------------------------------
 
-bool is_number(const std::string& s)
+bool is_number(string line)
 {
-    std::string::const_iterator it = s.begin();
-    while (it != s.end() && std::isdigit(*it)) ++it;
-    return !s.empty() && it == s.end();
+    char* p;
+    strtol(line.c_str(), &p, 10);
+    return *p == 0;
 }
 
 // ---------------------------------------------
@@ -280,7 +280,7 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     // -------------------------------------------------------
     
     isNumber = is_number(mqtt_message3);
-
+    
     if(isNumber==1) {
             data = stof(mqtt_message3);
             topic += split(topicName, "/",1);
