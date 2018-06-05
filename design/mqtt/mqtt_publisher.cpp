@@ -13,7 +13,7 @@ using namespace std;
 
 //Please replace the following address with the address of your server
 #define ADDRESS         "tcp://192.168.0.29:1883"
-#define CLIENTID        "rpi1"
+#define CLIENTID        "zybo0"
 #define AUTHMETHOD      "garryc3"
 #define AUTHTOKEN       "password"
 #define TOPIC           "ee580/congest"
@@ -88,8 +88,8 @@ int main(int argc, char* argv[]) {
         
            MQTTClient_publishMessage(client, TOPIC, &pubmsg, &token);
            cout << "Waiting for up to " << (int)(TIMEOUT/1000) <<
-                " seconds for publication of " << "hello from the zybo board" <<
-                " \non topic " << TOPIC << " for ClientID: " << CLIENTID << endl;
+                " seconds for publication of " <<  " \non topic " << 
+                 TOPIC << " for ClientID: " << CLIENTID << endl;
            rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
            cout << "Message with token " << (int)token << " delivered." << endl;
            usleep(200000);
