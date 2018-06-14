@@ -1,14 +1,28 @@
+// -------------------------------------------------------------------------
+//       DCU Vehicle counter IP
+//
+//  Author:       Cathal Garry
+//  Description:  Custom IP for counting the number of
+//                vehicles on a motorway
+// ------------------------------------------------------------------------
+
 #include "vehicleCount.h"
 
-void vehicleCount(stream_t& stream_in, stream_t& stream_out, int& result)
+void vehicleCount(AXI_STREAM& stream_in, AXI_STREAM& stream_out, int& debug, int& result)
 {
 	// ----------------------------------------
 	//   directives
 	// ----------------------------------------
 
+	// creates AXI stream ports
 	#pragma HLS INTERFACE axis register both port=stream_out
 	#pragma HLS INTERFACE axis register both port=stream_in
+
+	// creates AXIS registers
 	#pragma HLS INTERFACE s_axilite port=result
+	#pragma HLS INTERFACE s_axilite port=debug
+
+	// Impoves synthesis flow
     #pragma HLS dataflow
 
 	// ----------------------------------------
@@ -35,21 +49,23 @@ void vehicleCount(stream_t& stream_in, stream_t& stream_out, int& result)
 	//   Local Storage
 	// ----------------------------------------
 
-    rgb_img_t imgRGB(rows, cols);
-    rgb_img_t imgGray(rows, cols);
-    rgb_img_t imgDilate0(rows, cols);
-    rgb_img_t imgDilate1(rows, cols);
-    rgb_img_t imgDilate2(rows, cols);
-    rgb_img_t imgEdges0(rows, cols);
-    rgb_img_t imgEdges1(rows, cols);
-    rgb_img_t imgMerge(rows, cols);
-    rgb_img_t imgOut(rows, cols);
-    single_img_t imgSplitCh0(rows, cols);
-    single_img_t imgSplitCh1(rows, cols);
-    single_img_t imgSplitCh2(rows, cols);
-    single_img_t imgThresholdCh0(rows, cols);
-    single_img_t imgThresholdCh1(rows, cols);
-    single_img_t imgThresholdCh2(rows, cols);
+    RGB_IMAGE 	 imgRGB      		(rows, cols);
+    RGB_IMAGE 	 imgDuplicate0      (rows, cols);
+    RGB_IMAGE 	 imgDuplicate1      (rows, cols);
+    RGB_IMAGE 	 imgGray     		(rows, cols);
+    RGB_IMAGE 	 imgDilate0  		(rows, cols);
+    RGB_IMAGE 	 imgDilate1  		(rows, cols);
+    RGB_IMAGE 	 imgDilate2  		(rows, cols);
+    RGB_IMAGE 	 imgEdges0   		(rows, cols);
+    RGB_IMAGE 	 imgEdges1   		(rows, cols);
+    RGB_IMAGE 	 imgMerge    		(rows, cols);
+    RGB_IMAGE 	 imgOut      		(rows, cols);
+    SINGLE_IMAGE imgSplitCh0 		(rows, cols);
+    SINGLE_IMAGE imgSplitCh1 		(rows, cols);
+    SINGLE_IMAGE imgSplitCh2 		(rows, cols);
+    SINGLE_IMAGE imgThresholdCh0    (rows, cols);
+    SINGLE_IMAGE imgThresholdCh1    (rows, cols);
+    SINGLE_IMAGE imgThresholdCh2    (rows, cols);
 
 
     // ----------------------------------------
@@ -57,7 +73,8 @@ void vehicleCount(stream_t& stream_in, stream_t& stream_out, int& result)
     // ----------------------------------------
 
     hls::AXIvideo2Mat(stream_in, imgRGB);
-    hls::CvtColor<HLS_RGB2GRAY>(imgRGB, imgGray);
+    replicate(imgRGB, imgDuplicate0, imgDuplicate1, rows, cols);
+    hls::CvtColor<HLS_RGB2GRAY>(imgDuplicate0, imgGray);
 
 
 
@@ -93,7 +110,7 @@ void vehicleCount(stream_t& stream_in, stream_t& stream_out, int& result)
     //  Stage 4: Calculate result
     // ----------------------------------------
 
-    detectVehicleInLane<rgb_img_t,rgb_pixel_t>(imgMerge, imgOut, rows, cols, result);
+    detectVehicleInLane<RGB_IMAGE,RGB_PIXEL>(imgMerge, imgDuplicate1, imgOut, rows, cols, debug,result);
 
     // ----------------------------------------
     // output image
@@ -108,13 +125,16 @@ void vehicleCount(stream_t& stream_in, stream_t& stream_out, int& result)
 template<typename IMG_T, typename PIXEL_T>
 void detectVehicleInLane(
 	IMG_T& img_in0,
+	IMG_T& img_in1,
 	IMG_T& img_out,
 	int rows,
 	int cols,
+	int& debug,
 	int& result)
 {
 
 	PIXEL_T pin0;
+	PIXEL_T pin1;
 	PIXEL_T pout;
 
 	// set result to 0 by default
@@ -135,8 +155,9 @@ void detectVehicleInLane(
 			   #pragma HLS LOOP_TRIPCOUNT min=1 max=1280
 			   #pragma HLS pipeline rewind
 
-			   // input pixel
+			   // input pixels
 			   img_in0 >> pin0;
+			   img_in1 >> pin1;
 
 			   // --------------------------------------------------
 			   //  Left hand side of the motorway
@@ -225,10 +246,20 @@ void detectVehicleInLane(
 			   // --------------------------------------------------
 
 			   else{
-				   // pass value through
-				   pout.val[0] = pin0.val[0];
-				   pout.val[1] = pin0.val[1];
-				   pout.val[2] = pin0.val[2];
+				   if(debug==0)
+				   {
+					   // Pass through orginal image
+					   pout.val[0] = pin1.val[0];
+					   pout.val[1] = pin1.val[1];
+					   pout.val[2] = pin1.val[2];
+				   }
+				   else
+				   {
+					   // Pass through debug image
+					   pout.val[0] = pin0.val[0];
+					   pout.val[1] = pin0.val[1];
+					   pout.val[2] = pin0.val[2];
+				   }
 			   }
 
 			   // output pixel
@@ -266,4 +297,32 @@ void detectVehicleInLane(
     {
 	   result=result+32;
     }
+}
+
+
+// -----------------------------------
+// replicate stream
+// -----------------------------------
+void replicate(RGB_IMAGE& img_in, RGB_IMAGE& img_out0, RGB_IMAGE& img_out1, int rows, int cols)
+{
+
+	RGB_PIXEL pin;
+	RGB_PIXEL pout;
+
+	L_row: for(int row = 0; row < rows; row++) {
+	#pragma HLS LOOP_TRIPCOUNT min=720 max=1080
+
+		L_col: for(int col = 0; col < cols; col++) {
+		#pragma HLS LOOP_TRIPCOUNT min=1280 max=1920
+		#pragma HLS pipeline rewind
+
+				   img_in >> pin;
+
+				   pout = pin;
+
+				   img_out0 << pout;
+				   img_out1 << pout;
+				}
+		}
+
 }
