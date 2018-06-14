@@ -9,7 +9,7 @@
     #define MAX_HEIGHT 720
 
     // types
-    typedef hls::stream<ap_axiu<32,1,1,1> >               AXI_STREAM;
+    typedef hls::stream<ap_axiu<24,1,1,1> >               AXI_STREAM;
     typedef hls::Mat<MAX_HEIGHT,   MAX_WIDTH,   HLS_8UC3> RGB_IMAGE;
     typedef hls::Mat<MAX_HEIGHT,   MAX_WIDTH,   HLS_8UC1> GRAY_IMAGE;
     typedef hls::Scalar<1, unsigned char>                 GRAY_PIXEL;
