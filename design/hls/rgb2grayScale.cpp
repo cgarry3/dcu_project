@@ -17,7 +17,7 @@ void rgb2grayScale_filter(AXI_STREAM& INPUT_STREAM, AXI_STREAM& OUTPUT_STREAM)
 {
 	// Creates an input and output stream
 	#pragma HLS INTERFACE axis register both port=INPUT_STREAM
-	#pragma HLS INTERFACE axis register both port=INPUT_STREAM
+	#pragma HLS INTERFACE axis register both port=OUTPUT_STREAM
 
 	// Removes ap_ctrl interface
 	#pragma HLS INTERFACE ap_ctrl_none port=return
