@@ -1,9 +1,11 @@
-/*
- * motorwayTraffic.h
- *
- *  Created on: 25 May 2018
- *      Author: cgarry
- */
+// -------------------------------------------------------------------------
+//       DCU MotorWay Class
+//
+//  Author:       Cathal Garry
+//  Description:  Header file for motorwayTraffic class
+//
+// ------------------------------------------------------------------------
+
 
 #ifndef MOTORWAYTRAFFIC_H_
 #define MOTORWAYTRAFFIC_H_
