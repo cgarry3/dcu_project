@@ -1,12 +1,9 @@
-// =======================================================
-// Author:       Cathal Garry
-// Email:        cathal.garry3@mail.dcu.ie
-// Date:         10 Dec 2017
-// Description:  This is program counts vehicles on the
-//               M6 in England. The program is built using
-//               existing openCV function and implements a
-//               a count for the left and right lane.
-// ========================================================
+// -------------------------------------------------------------------------
+//       DCU Vehicle counter IP
+//
+//  Author:       Cathal Garry
+//  Description:  Testbench for vehicle counting IP
+// ------------------------------------------------------------------------
 
 // --------------------------------------------------------------------
 // Includes
@@ -227,11 +224,12 @@ int main(void) {
         // -------------------------------------------------------
 
         int result;
+        int debug=0;
 
         // DUT
-        stream_t stream_in, stream_out;
+        AXI_STREAM stream_in, stream_out;
         cvMat2AXIvideo(imgIn, stream_in);
-        vehicleCount(stream_in, stream_out, result);
+        vehicleCount(stream_in, stream_out, debug,result);
         AXIvideo2cvMat(stream_out, imgOut);
 
         cv::imwrite("C:\\Users\\cgarry\\Google Drive\\dcu_masters\\project\\design\\image_algorthim\\data\\test.jpg", imgOut);
