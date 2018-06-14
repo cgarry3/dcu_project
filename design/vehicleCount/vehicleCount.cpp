@@ -21,9 +21,12 @@ void vehicleCount(AXI_STREAM& stream_in, AXI_STREAM& stream_out, int& debug, int
 	// creates AXIS registers
 	#pragma HLS INTERFACE s_axilite port=result
 	#pragma HLS INTERFACE s_axilite port=debug
+	
+        // Removes ap_ctrl interface
+	#pragma HLS INTERFACE ap_ctrl_none port=return
 
 	// Impoves synthesis flow
-    #pragma HLS dataflow
+        #pragma HLS dataflow
 
 	// ----------------------------------------
 	//   Constants
