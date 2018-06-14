@@ -1,9 +1,10 @@
-/*
- * motorwayTraffic.cpp
- *
- *  Created on: 25 May 2018
- *      Author: cgarry
- */
+// -------------------------------------------------------------------------
+//       DCU MotorWay Class
+//
+//  Author:       Cathal Garry
+//  Description:  Class for keeping track of vehicles on
+//                motorway
+// ------------------------------------------------------------------------
 
 #include "motorwayTraffic.h"
 
