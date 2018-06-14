@@ -1,23 +1,40 @@
-#ifndef RGB2GRAYSCALE_H
-#define RGB2GRAYSCALE_H
+#include "edge_dect.h"
 
-    #include  "hls_video.h"
-    #include <ap_fixed.h>
+ 
+void edge_detect(stream_t& stream_in, stream_t& stream_out)
+{
+	// directives
+	#pragma HLS INTERFACE axis register both port=stream_out
+	#pragma HLS INTERFACE axis register both port=stream_in
+    #pragma HLS dataflow
 
-    // defines
-    #define MAX_WIDTH  1280
-    #define MAX_HEIGHT 720
+ 
+	// Image width and height
+    int const rows = MAX_HEIGHT;
+    int const cols = MAX_WIDTH;
 
-    // types
-    typedef hls::stream<ap_axiu<32,1,1,1> >               AXI_STREAM;
-    typedef hls::Mat<MAX_HEIGHT,   MAX_WIDTH,   HLS_8UC3> RGB_IMAGE;
-    typedef hls::Mat<MAX_HEIGHT,   MAX_WIDTH,   HLS_8UC1> GRAY_IMAGE;
-    typedef hls::Scalar<1, unsigned char>                 GRAY_PIXEL;
+ 
+    // local storage
+    rgb_img_t img0(rows, cols);
+    rgb_img_t img1(rows, cols);
+    rgb_img_t img2(rows, cols);
+    rgb_img_t img3(rows, cols);
+    rgb_img_t img4(rows, cols);
+    rgb_img_t img5(rows, cols);
 
-    // functions
-    void rgb2grayScale_filter(
-		AXI_STREAM& INPUT_STREAM,
-		AXI_STREAM& OUTPUT_STREAM );
+ 
+    // turn gray
+    hls::AXIvideo2Mat(stream_in, img0);
+    hls::CvtColor<HLS_RGB2GRAY>(img0, img1);
 
+ 
+    // dilate blur
+    hls::Dilate(img1, img2);
 
-#endif
+    // detect edge
+    hls::Sobel<1,0,3>(img2, img3);
+    hls::CvtColor<HLS_GRAY2RGB>(img3, img4);
+
+    // output image
+    hls::Mat2AXIvideo(img4, stream_out);
+}
