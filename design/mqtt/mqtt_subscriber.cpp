@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "MQTTClient.h"
 
 
@@ -20,11 +21,12 @@ using namespace std;
 #define TIMEOUT     10000L
 
 // Used for controlling LED
-#define GPIO        "/sys/class/gpio/"
-#define GPIO_NO     23
+#define GPIO            "/sys/class/gpio/"
+#define GPIO_NO         23
+#define LWNUMLEDFLASHES 5
 
 // default congestion leve
-#define DDEFAULT_CONGESTION_LEVEL 1
+#define DEFAULT_NUM_OF_VEHICLES 3
 
 // sample of congestion results
 // four samples gives us an estimate over 2 minutes
@@ -33,15 +35,16 @@ using namespace std;
 volatile MQTTClient_deliveryToken deliveredtoken;
 
 // ---------------------------------------------
-// Congestion of motorway
-// a sample is recieved every 30 second
-// 1 = quick flow low traffic (120kph)
-// 2 = quick flow high traffic (100kph)
-// 3 = low flow high traffic (80kph)
-// 4 = low flow low traffic (120kph)
+// Number of Vehicle passed on motorway
+// a sample is recieved every 1 second
+// 0 = Accident has occured (50kph)
+// 1 = Very slow traffic or possible accident (80kph)
+// 2 = High Traffic  (80kph)
+// 3 = Medium flow of traffic (100kph)
+// 4 = fast flow of traffic (120kph)
 // ---------------------------------------------
 
-int congestionLevelResults[SAMPLE_SIZE];
+int numberOfVehiclesPassed[SAMPLE_SIZE];
 
 // ---------------------------------------------
 // Motorway speed(KMPH)
@@ -55,14 +58,14 @@ int motorway_speed = 100;
 // Update motorway speed
 // ---------------------------------------------
 
-void updateMotorWaySpeed()
+int updateMotorWaySpeed()
 {
     // initial average
     int average = 0;
     
     for(int x=0; x<SAMPLE_SIZE; x++)
     {
-        average = congestionLevelResults[x] + average;
+        average = numberOfVehiclesPassed[x] + average;
     }
     
     // final average
@@ -70,14 +73,18 @@ void updateMotorWaySpeed()
     
     // new motorway speed based on the average
     switch(1) {
-        case 1 : motorway_speed = 120; // quick flow low traffic
-        case 2 : motorway_speed = 100; // quick flow high traffic
-        case 3 : motorway_speed = 80;  // low flow high traffic
-        case 4 : motorway_speed = 120; // low flow low traffic
+        case 0 : motorway_speed = 50;  // Accident has occur traffic is stalled
+        case 1 : motorway_speed = 80;  // High Traffic or possible accident
+        case 2 : motorway_speed = 80;  // High Traffic 
+        case 3 : motorway_speed = 100; // Medium flow of traffic
+        case 4 : motorway_speed = 120; // fast flow of traffic
         default: motorway_speed = 80;  // default
     }
     
     cout << "New motorway speed: " << motorway_speed << endl;
+    
+    // returns new average
+    return average;
 }
 
 // ---------------------------------------------
@@ -89,11 +96,11 @@ void updateCongestionResult(int newResult)
    for(int x=1; x<SAMPLE_SIZE; x++)
    {
        // shift everything to the left by one
-       congestionLevelResults[x] = congestionLevelResults[x-1];
+       numberOfVehiclesPassed[x] = numberOfVehiclesPassed[x-1];
    }
    
    // load new value
-   congestionLevelResults[0] = newResult;
+   numberOfVehiclesPassed[0] = newResult;
 }
 
 // ---------------------------------------------
@@ -295,15 +302,33 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
 
     // Last Will Error
     if(last_will==1) {
-        turnOnLed();
-    } 
-    // if number of cars is greater than 50
-    else if((data > 50))  {
-        turnOnLed();
+        // delay of one second
+        unsigned int delay_usec = 1*1000000;
+        
+        // set to 100 by default
+        motorway_speed=100;
+        
+        // flash LED to indicate fail
+        for(int x=0; x<LWNUMLEDFLASHES; x++){
+            turnOnLed();
+            usleep(delay_usec);
+            turnOffLed();
+            usleep(delay_usec);
+        }
     } 
     else {
-        updateCongestionResult(data);
+        // update array of samples
+        int newAverage = updateCongestionResult(data);
         updateMotorWaySpeed();
+        
+        // check if an accident has occured
+        if(newAverage<=0){
+            turnOnLed();
+        }
+        // turn off if the accident has passed
+        else{
+            turnOffLed();
+        }
     }
     
     // -------------------------------------------------------
@@ -335,7 +360,7 @@ int main(int argc, char* argv[]) {
     // ---------------------------------------
     
     // default of 10 cars starting off
-    std::fill(congestionLevelResults, congestionLevelResults + SAMPLE_SIZE, DDEFAULT_CONGESTION_LEVEL);
+    std::fill(numberOfVehiclesPassed, numberOfVehiclesPassed + SAMPLE_SIZE, DEFAULT_NUM_OF_VEHICLES);
     cout << "Current motorway speed: " << motorway_speed << endl;
     
 
