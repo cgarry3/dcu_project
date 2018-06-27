@@ -9,13 +9,18 @@
 import paho.mqtt.client as mqtt
 import time
 
-## rate of messages published per second
+## MQTT setup
+user     = "cgarry"
+password = "password"
+port     = 1883
+
+## Rate of messages published per second
 publishRate = 1
 
-def setupHDMIPipe():
+def setupHDMIPipe(mosq, obj):
     ## add code here for setting up HDMI pipe
     
-def readResultReg():
+def readResultReg(mosq, obj):
     ## add code here to read result from 
     ## custom IP in HDMI pipe
 
@@ -24,7 +29,6 @@ def on_connect(mosq, obj, rc):
     print("rc: " + str(rc))
 
 def on_message(mosq, obj, msg):
-    message = '{d:{Number of Vehicles:' + randint(0, 5) + '}}'
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
     message = msg.payload
     mqttc.publish("f2",msg.payload);
@@ -38,17 +42,26 @@ def on_subscribe(mosq, obj, mid, granted_qos):
 def on_log(mosq, obj, level, string):
     print(string)
 
+## create client objec
 mqttc = mqtt.Client()
 
+## Assign event callbacks
+mqttc.on_message = on_message
+mqttc.on_connect = on_connect
+mqttc.on_publish = on_publish
+mqttc.on_subscribe = on_subscribe
+
+## set user name and password
+client.username_pw_set(user, password=password)
+
+## Connect
+mqttc.connect("localhost", port,60)
+
 while True:
-    # Assign event callbacks
-    mqttc.on_message = on_message
-    mqttc.on_connect = on_connect
-    mqttc.on_publish = on_publish
-    mqttc.on_subscribe = on_subscribe
-    
-    # Connect
-    mqttc.connect("localhost", 1883,60)
+    ## publish data
+    topic   =  'm3/numOfCars'
+    message = '{d:{Number of Vehicles:' + randint(0, 5) + '}}'
+    client1.publish(topic,message) 
     
     # sleep
     time.sleep(publishRate)
