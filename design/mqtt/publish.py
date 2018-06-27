@@ -10,7 +10,7 @@ import paho.mqtt.client as mqtt
 import time
 
 ## MQTT setup
-user     = "cgarry"
+user     = "garryc3"
 password = "password"
 port     = 1883
 
