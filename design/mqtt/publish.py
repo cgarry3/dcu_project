@@ -15,8 +15,8 @@ password = "password"
 port     = 1883
 
 ## MQTT last will
-lwm="-1" # Last will message
-lwTopic="ee580/m3P0"
+lwm='unexcepted exit' # Last will message
+lwTopic='ee580/m3P0'
 
 ## Rate of messages published per second
 publishRate = 1
