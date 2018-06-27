@@ -59,7 +59,7 @@ mqttc.connect("localhost", port,60)
 
 while True:
     ## publish data
-    topic   =  'm3/numOfCars'
+    topic   =  'ee580/m3P0'
     message = '{d:{Number of Vehicles:' + randint(0, 5) + '}}'
     client1.publish(topic,message) 
     
