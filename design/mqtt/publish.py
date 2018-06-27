@@ -14,6 +14,10 @@ user     = "garryc3"
 password = "password"
 port     = 1883
 
+## MQTT last will
+lwm="-1" # Last will message
+lwTopic="ee580/m3P0"
+
 ## Rate of messages published per second
 publishRate = 1
 
@@ -53,6 +57,9 @@ mqttc.on_subscribe = on_subscribe
 
 ## set user name and password
 client.username_pw_set(user, password=password)
+
+## last will setup
+client.will_set(lwTopic,lwm,QOS1,retain=False)
 
 ## Connect
 mqttc.connect("localhost", port,60)
