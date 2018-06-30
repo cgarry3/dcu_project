@@ -7,9 +7,11 @@
 #############################################################
 
 import paho.mqtt.client as mqtt
+import random
 import time
 
 ## MQTT setup
+QoS      = 1
 user     = "garryc3"
 password = "password"
 port     = 1883
@@ -23,10 +25,12 @@ publishRate = 1
 
 def setupHDMIPipe(mosq, obj):
     ## add code here for setting up HDMI pipe
-    
+    print("setting up hdmi!!!")
+
 def readResultReg(mosq, obj):
-    ## add code here to read result from 
+    ## add code here to read result from
     ## custom IP in HDMI pipe
+    print("reading result!!!")
 
 def on_connect(mosq, obj, rc):
     mqttc.subscribe("f", 0)
@@ -56,23 +60,24 @@ mqttc.on_publish = on_publish
 mqttc.on_subscribe = on_subscribe
 
 ## set user name and password
-client.username_pw_set(user, password=password)
+mqttc.username_pw_set(user, password=password)
 
 ## last will setup
-client.will_set(lwTopic,lwm,QOS1,retain=False)
+mqttc.will_set(lwTopic, lwm, QoS, retain=False)
 
 ## Connect
-mqttc.connect("localhost", port,60)
+mqttc.connect("192.168.0.29", port,60)
 
 while True:
     ## publish data
     topic   =  'ee580/m3P0'
-    message = '{d:{Number of Vehicles:' + randint(0, 5) + '}}'
-    client1.publish(topic,message) 
-    
+    message = '{d:{Number of Vehicles:' + str(random.randint(0, 5)) + '}}'
+    mqttc.publish(topic,message)
+
     # sleep
     time.sleep(publishRate)
-
-
+    
+    
 # Continue the network loop
 #mqttc.loop_forever()
+
