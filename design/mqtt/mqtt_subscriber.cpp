@@ -91,7 +91,7 @@ int updateMotorWaySpeed()
 // Update number of cars
 // ---------------------------------------------
 
-void updateCongestionResult(int newResult)
+void updateNumberOfVehiclesPassed(int newResult)
 {
    for(int x=1; x<SAMPLE_SIZE; x++)
    {
@@ -318,8 +318,8 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     } 
     else {
         // update array of samples
-        int newAverage = updateCongestionResult(data);
-        updateMotorWaySpeed();
+        updateNumberOfVehiclesPassed(data);
+        int newAverage = updateMotorWaySpeed();
         
         // check if an accident has occured
         if(newAverage<=0){
