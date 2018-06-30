@@ -130,10 +130,16 @@ bool isFloat( string myString ) {
 // ---------------------------------------------
 
 bool is_number(string line)
-{
-    char* p;
-    strtol(line.c_str(), &p, 10);
-    return *p == 0;
+{  
+    // check if line is not blank
+    if(!line.empty()){
+        char* p;
+        strtol(line.c_str(), &p, 10);
+        return *p == 0;
+    }
+    
+    return 0;
+    
 }
 
 // ---------------------------------------------
