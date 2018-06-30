@@ -69,17 +69,25 @@ int updateMotorWaySpeed()
     }
     
     // final average
+
     average = (average/SAMPLE_SIZE);
-    
+
     // new motorway speed based on the average
-    switch(1) {
+    switch(average) {
         case 0 : motorway_speed = 50;  // Accident has occur traffic is stalled
+                 break;
         case 1 : motorway_speed = 80;  // High Traffic or possible accident
-        case 2 : motorway_speed = 80;  // High Traffic 
+                 break;
+        case 2 : motorway_speed = 80;  // High Traffic
+                 break;
         case 3 : motorway_speed = 100; // Medium flow of traffic
+                 break;
         case 4 : motorway_speed = 120; // fast flow of traffic
+                 break;
         default: motorway_speed = 80;  // default
+                 break;
     }
+
     
     cout << "New motorway speed: " << motorway_speed << endl;
     
