@@ -22,7 +22,7 @@ using namespace std;
 
 // Used for controlling LED
 #define GPIO            "/sys/class/gpio/"
-#define GPIO_NO         23
+#define GPIO_NO         2
 #define LWNUMLEDFLASHES 5
 
 // default congestion leve
