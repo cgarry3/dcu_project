@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//       DCU Vehicle counter IP
+//       DCU White Line Detector IP
 //
 //  Author:       Cathal Garry
 //  Description:  Custom IP for detecting white lines in an image
