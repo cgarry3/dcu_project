@@ -1,5 +1,0 @@
-## compile mqtt publisher on zybo 
-sudo g++ -std=c++0x -Wall  ./mqtt_pub.cpp-o publish  -lpaho-mqtt3c
-
-## run
-sudo ./publish
