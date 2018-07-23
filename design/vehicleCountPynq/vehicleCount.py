@@ -27,6 +27,9 @@ numOfRightLanes = numOfLanes/2
 frameRatePerSecond = 25
 timePerFrame = 1/frameRatePerSecond
 
+## Path to Overlay
+overlayPath = "/home/xilinx/jupyter_notebooks/overlays/debug/debug8/debug8.bit"
+
 ######################################
 ## MQTT Variables
 ######################################
@@ -84,9 +87,6 @@ for i in range(numOfLanes):
 ######################################
 
 def setupHDMIPipe():
-    ## load overlay for vehicle counting IP
-    ol = pynq.Overlay("/home/xilinx/jupyter_notebooks/overlays/debug/debug8/debug8.bit")
-
     ## Configuring input and output video streams
     ol.video.hdmi_in.configure()
     ol.video.hdmi_out.configure(ol.video.hdmi_in.mode)
@@ -97,6 +97,7 @@ def setupHDMIPipe():
 
     ## Connecting HDMI directly to HDMI out
     ol.video.hdmi_in.tie(ol.video.hdmi_out)
+    time.sleep(120)
     
 def closeHDMIPipe():
     ## Closing HDMI stream In&Out
@@ -164,6 +165,10 @@ mqttSetup(brokerIP, port, user, password)
 ## Setup Video Pipeline
 #####################################
 
+## load overlay for vehicle counting IP
+ol = pynq.Overlay(overlayPath)
+
+## Setup HDMI Pipeline
 setupHDMIPipe()
 
 #####################################
@@ -174,7 +179,7 @@ mmio       = MMIO(IP_BASE_ADDRESS, ADDRESS_RANGE)
 frameCount = 0
 
 ## processing result from Custom IP
-while True:
+while frameCount<200:
     result = readResultReg()
     
     ###########################
@@ -212,6 +217,7 @@ while True:
     ###########################
     
     if(frameCount==timeBetweenPublishs):
+        vehCount=  sum(presentVehicleCount[1:3])
         topic   =  'ee580/m3P0'
         message = '{d:{Number of Vehicles:' + str(random.randint(0, 5)) + '}}'
         mqttc.publish(topic,message)
@@ -223,5 +229,7 @@ while True:
     
     frameCount = frameCount + 1
     time.sleep(timePerFrame)
+    
+closeHDMIPipe()
     
     
