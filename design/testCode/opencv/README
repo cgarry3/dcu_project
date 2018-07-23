@@ -1,0 +1,4 @@
+## to complile opencv app
+g++ -std=c++11  -o motor_720p motorwayMonitor.cpp motorwayTraffic.cpp motorwayTraffic.h  `pkg-config opencv --cflags --libs`
+
+
