@@ -17,6 +17,17 @@ from pynq.lib.video import *
 from collections import deque
 
 ######################################
+## Video Processing Variables
+######################################
+
+## Details of the image
+numOfLanes = 6
+numOfLeftLanes = numOfLanes/2
+numOfRightLanes = numOfLanes/2
+frameRatePerSecond = 25
+timePerFrame = 1/frameRatePerSecond
+
+######################################
 ## MQTT Variables
 ######################################
 
@@ -25,7 +36,7 @@ QoS      = 1
 user     = "garryc3"
 password = "password"
 port     = 1883
-brokerIP = "192.168.0.29"
+brokerIP = "192.168.0.39"
 
 ## MQTT Last Will
 lwm='unexcepted exit' # Last will message
@@ -43,16 +54,6 @@ IP_BASE_ADDRESS = 0x43C70000
 ADDRESS_RANGE = 0x10000
 RESULT_REG_OFFSET = 0x10
 
-######################################
-## Video Processing Variables
-######################################
-
-## Details of the image
-numOfLanes = 6
-numOfLeftLanes = numOfLanes/2
-numOfRightLanes = numOfLanes/2
-frameRatePerSecond = 25
-timePerFrame = 1/frameRatePerSecond
 
 ## Lane selection initialization
 laneSelect = []
@@ -181,7 +182,7 @@ while True:
     ###########################
     
     for x in range(numOfLanes):
-        resultTemp = laneSelect[x] & result
+        resultTemp = (laneSelect[x] & result) >> x
         ## remove oldest result in the list
         allLanesResults[x].pop(0)
         ## add new result
@@ -189,18 +190,21 @@ while True:
         
         ## check if a new vehicle has crossed the count line
         newVehicleCrossLine = False
-        for y in range(len(int0)-1, 0, -1): 
-            if( y==len(int0)-1 and allLanesResults[y]==1):
+        for y in range(len(allLanesResults[x])-1, 0, -1): 
+            if( y==len(allLanesResults[x])-1 and allLanesResults[x][y]==1):
                 newVehicleCrossLine=True
-            elif( allLanesResults[y]==0):
-                newVehicleCrossLine=True
-            else:
+            elif( allLanesResults[x][y]==1):
                 newVehicleCrossLine=False
         
         ## Increase count
         if(newVehicleCrossLine==True):
             presentVehicleCount[x]=presentVehicleCount[x]+1
             print("Lane" + str(x) + " count: " + str(presentVehicleCount[x]))
+            
+        print("all results" + str(x) + ":")
+        print(allLanesResults[x])
+    print("all vechicle counts:")
+    print(presentVehicleCount)
         
     
     ###########################
