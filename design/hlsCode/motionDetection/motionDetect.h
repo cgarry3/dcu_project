@@ -3,8 +3,7 @@
 //       DCU Vehicle counter IP
 //
 //  Author:       Cathal Garry
-//  Description:  Header file for counting the number of
-//                vehicles on a motorway
+//  Description:  Header file for motion detection filter
 // ------------------------------------------------------------------------
 
 #ifndef VEHICLECOUNT_H
@@ -21,11 +20,11 @@
 	#define MAX_WIDTH 1280
 
 	// function defines
-    #define MOTIONBOXSIZE 40
+        #define MOTIONBOXSIZE 40
 
-    // Image width and height
-    int const rows = MAX_HEIGHT;
-    int const cols = MAX_WIDTH;
+        // Image width and height
+        int const rows = MAX_HEIGHT;
+        int const cols = MAX_WIDTH;
 
 	// constant values
 	const int motionBoxSize     = MOTIONBOXSIZE;
