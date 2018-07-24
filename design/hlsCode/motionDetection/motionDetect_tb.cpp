@@ -1,8 +1,8 @@
 // -------------------------------------------------------------------------
-//       DCU Vehicle counter IP
+//       DCU Motion Detection IP
 //
 //  Author:       Cathal Garry
-//  Description:  Testbench for vehicle counting IP
+//  Description:  Testbench for Motion Detection IP
 // ------------------------------------------------------------------------
 
 // --------------------------------------------------------------------
