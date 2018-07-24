@@ -1,3 +1,12 @@
+// -------------------------------------------------------------------------
+//       DCU Custom RGB to Grayscale Filter
+//
+//  Author:       Cathal Garry
+//  Description:  This is a custom RGB to Grayscale filter for
+//                720P images. It contains an input and output AXI stream
+//                ports.
+// -------------------------------------------------------------------------
+
 #ifndef RGB2GRAYSCALE_H
 #define RGB2GRAYSCALE_H
 
