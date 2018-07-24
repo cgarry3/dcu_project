@@ -19,9 +19,9 @@
 	#define MAX_HEIGHT 720
 	#define MAX_WIDTH 1280
 
-  // Image width and height
-  int const rows = MAX_HEIGHT;
-  int const cols = MAX_WIDTH;
+        // Image width and height
+        int const rows = MAX_HEIGHT;
+        int const cols = MAX_WIDTH;
 
 
 	// ----------------------------------------
