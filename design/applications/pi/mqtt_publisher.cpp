@@ -1,4 +1,11 @@
-// Based on the Paho C code example from www.eclipse.org/paho/
+// --------------------------------------------
+//         MQTT Publisher
+//  Description: MQTT publisher used for 
+//             publishing the number of cars
+//             that pass on a motorway
+//
+//---------------------------------------------
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -11,7 +18,7 @@
 
 using namespace std;
 
-//Please replace the following address with the address of your server
+// MQTT Defines
 #define ADDRESS         "tcp://192.168.0.29:1883"
 #define CLIENTID        "zybo0"
 #define AUTHMETHOD      "garryc3"
@@ -25,12 +32,18 @@ using namespace std;
 #define LASTWILLRETAIN  false
 #define NUM_PUBLISHS    500
 
-// returns a random number ranging from min to max
+// -----------------------------------------------------
+//  Returns a random number ranging from min to max
+// -----------------------------------------------------
 int randNum(int min, int max)
 {
     int randNum = rand()%(max-min + 1) + min;
     return randNum;
 }
+
+// -----------------------------------------------------
+//  Main Function
+// -----------------------------------------------------
 
 int main(int argc, char* argv[]) {
     
