@@ -1,7 +1,7 @@
 // =======================================================
 // Author:       Cathal Garry
 // Email:        cathal.garry3@mail.dcu.ie
-// Date:         10 Dec 2017
+// Date:         10 July 2018
 // Description:  This is program tracks the motion of 
 //               vehicles from one image to another.
 // ========================================================
@@ -75,7 +75,7 @@ const int NUMRIGHTLANES = 3;
 void checkIfvehiclesCrossedOnLine(cv::Mat &imgFrame, int &result);
 void addCountToImage(int leftLaneVehicleCount,int rightLaneVehicleCount, cv::Mat &imgFrame);
 void addROIToImage(cv::Mat &imgFrame, cv::Rect rects[], int rectsSize);
-void motionDection(cv::Mat &imgIn, cv::Mat &imgOut,cv::Mat &imgOut2, int rows, int cols);
+void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, int rows, int cols);
 
 void thinLine_filter_45Degrees(cv::Mat& img_in, cv::Mat& img_out);
 void thickLine_filter_45Degrees(cv::Mat& img_in, cv::Mat& img_out);
@@ -253,21 +253,19 @@ int main(void) {
     while (capVideo.isOpened() && chCheckForEscKey != 27) {
 
         cv::Mat imgFrame1Copy = inpuFrame1.clone();
-        cv::Mat imgFrame2     = inpuFrame1.clone();
+	    
         // -------------------------------------------------------
         //  Stage 4:  Update for next iteration
         // -------------------------------------------------------
 
-        int result;
+	// default result
+        int result=0;
 
         // motion detection
-        motionDection(imgFrame1Copy, imgFrame1Copy, imgFrame2,  rows, cols);
+        motionDection(imgFrame1Copy, imgFrame1Copy,  rows, cols);
 
-        // check for cars in each lane
+        // check for cars in each lane(needs to update for motion detection)
         //checkIfvehiclesCrossedOnLine(imgFrame1Copy, result);
-
-
-        //std::cout << "Result is: " << result << std::endl;
 
         if((result&0x1)==1)
         {
@@ -328,18 +326,10 @@ int main(void) {
             break;
         }
 
+	// update frame count
         frameCount++;
-
-
-        std::ostringstream os;
-        os << "C:\\Users\\cgarry\\Google Drive\\dcu_masters\\project\\design\\image_algorthim\\data\\output" << frameCount << ".jpg";
-        std::string path = os.str();
-
-        //cv::imwrite(path, imgFrame1Copy);
-        //if(frameCount==6)
-        //{
-        //	break;
-        //}
+	    
+	// Wait for ESC key
         chCheckForEscKey = cv::waitKey(1);
 
     }
@@ -352,104 +342,9 @@ int main(void) {
 
 void checkIfvehiclesCrossedOnLine(cv::Mat &imgFrame, int &result){
 
-	// image variables
-    cv::Mat imgGray;
-    cv::Mat imgDilate;
-    cv::Mat imgEdges;
-    cv::Mat imgThreshold;
-
-	// ------------------------------------------
-	// Start Execution time
-	// ------------------------------------------
-
-	clock_t tStart = clock();
 
     // -------------------------------------------------------
-    //  Stage 1:  Turn Gray
-    // -------------------------------------------------------
-
-    cv::cvtColor( imgFrame, imgGray, cv::COLOR_BGR2GRAY );
-
-    // -------------------------------------------------------
-    //  Stage 3:  Create image of edge features
-    // -------------------------------------------------------
-
-    // sobel hyperparameters
-    cv::Sobel(imgGray,imgEdges, CV_8U, 1, 0);
-
-    // show image
-    cv::imshow("Edge Detection", imgEdges);
-
-    // -------------------------------------------------------
-    //  Stage 2:  Reduce granularity
-    // -------------------------------------------------------
-
-    cv::Mat reducedGranularity = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(REDUCED_GRAN_BOX_SIZE, REDUCED_GRAN_BOX_SIZE));
-
-    // Dilating and erode the images
-	cv::dilate(imgEdges, imgDilate, reducedGranularity);
-	cv::dilate(imgDilate, imgDilate, reducedGranularity);
-	cv::erode(imgDilate, imgDilate, reducedGranularity);
-
-    // show image
-    cv::imshow("Reduced Granularity", imgDilate);
-
-    // -------------------------------------------------------
-    //  Stage 3:  Set all highed values to all white
-    // -------------------------------------------------------
-
-    cv::threshold(imgDilate, imgThreshold, 30, 254.0, CV_THRESH_BINARY);
-
-
-    // -------------------------------------------------------
-    //  Stage 4:
-    // -------------------------------------------------------
-
-    // Split frame for parellal processing
-    cv::Mat imgDiplicate0 = imgThreshold.clone();
-    cv::Mat imgDiplicate1 = imgThreshold.clone();
-    cv::Mat imgDiplicate2 = imgThreshold.clone();
-
-    cv::Mat imgLineThin45;
-    cv::Mat imgThresLine45Thin;
-    cv::Mat imgLineThick45;
-    cv::Mat imgThresLine45Thick;
-    cv::Mat imgLineThin90;
-    cv::Mat imgThresLine90Thin;
-    cv::Mat imgLineThick90;
-    cv::Mat imgThresLine90Thick;
-    cv::Mat imgLineThin135;
-    cv::Mat imgThresLine135Thin;
-    cv::Mat imgLineThick135;
-    cv::Mat imgThresLine135Thick;
-
-
-    // 45 degrees line filter
-    thinLine_filter_45Degrees(imgDiplicate0, imgLineThin45);
-    cv::threshold(imgLineThin45, imgThresLine45Thin, 20, 2, CV_THRESH_BINARY);
-    thickLine_filter_45Degrees(imgThresLine45Thin, imgLineThick45);
-    cv::threshold(imgLineThick45, imgThresLine45Thick, 20, 255, CV_THRESH_BINARY);
-
-    // 90 degrees line filter
-    thinLine_filter_90Degrees(imgDiplicate1, imgLineThin90);
-    cv::threshold(imgLineThin90, imgThresLine90Thin, 20, 2, CV_THRESH_BINARY);
-    thickLine_filter_90Degrees(imgThresLine90Thin, imgLineThick90);
-    cv::threshold(imgLineThick90, imgThresLine90Thick, 20, 255, CV_THRESH_BINARY);
-
-    // 135 degrees line filter
-    thinLine_filter_135Degrees(imgDiplicate2, imgLineThin135);
-    cv::threshold(imgLineThin135, imgThresLine135Thin, 20, 2, CV_THRESH_BINARY);
-    thickLine_filter_135Degrees(imgThresLine135Thin, imgLineThick135);
-    cv::threshold(imgLineThick135, imgThresLine135Thick, 20, 255, CV_THRESH_BINARY);
-
-    // OR together all three images
-    cv::Mat orImages = imgThresLine135Thick + imgThresLine135Thick + imgThresLine45Thick;
-
-    // show image
-    cv::imshow("Line Filter Image", orImages);
-
-    // -------------------------------------------------------
-    //  Stage 4:  Determine if car has passed a line in an image
+    //  Stage 1: Determine if car has passed a line in an image
     // -------------------------------------------------------
 
     // clear current value
@@ -468,7 +363,7 @@ void checkIfvehiclesCrossedOnLine(cv::Mat &imgFrame, int &result){
 
 		for(int i=0; i<ROIWIDTH/2; i++)
 		{
-				cv::Scalar colour = imgThreshold.at<uchar>(y+ROIHEIGHT,x+i);
+				cv::Scalar colour = imgFrame.at<uchar>(y+ROIHEIGHT,x+i);
 				if(colour.val[0]==254)
 				{
 					numOfWhitePixels++;
@@ -495,7 +390,7 @@ void checkIfvehiclesCrossedOnLine(cv::Mat &imgFrame, int &result){
 
 		for(int i=0; i<ROIWIDTH/2; i++)
 		{
-				cv::Scalar colour = imgThreshold.at<uchar>(y+ROIHEIGHT,x+i);
+				cv::Scalar colour = imgFrame.at<uchar>(y+ROIHEIGHT,x+i);
 				if(colour.val[0]==254)
 				{
 					numOfWhitePixels++;
@@ -525,10 +420,9 @@ void checkIfvehiclesCrossedOnLine(cv::Mat &imgFrame, int &result){
 
 void addCountToImage(int leftLaneVehicleCount,int rightLaneVehicleCount, cv::Mat &imgFrame) {
 
-
-	// -------------------------------------------
-	// Adding Left Lane Vehicle Count
-	// -------------------------------------------
+    // -------------------------------------------
+    //  Adding Left Lane Vehicle Count
+    // -------------------------------------------
 
     int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
     double dblFontScale = (imgFrame.rows * imgFrame.cols) / 300000.0;
@@ -543,9 +437,9 @@ void addCountToImage(int leftLaneVehicleCount,int rightLaneVehicleCount, cv::Mat
 
     cv::putText(imgFrame, std::to_string(leftLaneVehicleCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, COLOUR_GREEN, intFontThickness);
 
-	// -------------------------------------------
-	// Adding Left Lane Vehicle Count
-	// -------------------------------------------
+   // -------------------------------------------
+   //  Adding Left Lane Vehicle Count
+   // -------------------------------------------
 
     textSize = cv::getTextSize(std::to_string(leftLaneVehicleCount), intFontFace, dblFontScale, intFontThickness, 0);
 
@@ -568,24 +462,24 @@ void addROIToImage(cv::Mat &imgFrame, cv::Rect rects[], int rectsSize) {
 	// Adding regular box to Vehicles on image
 	// -------------------------------------------
 
-    for (int i = 0; i < rectsSize; i++) {
+	for (int i = 0; i < rectsSize; i++) {
 
-        	// add tracking box
-            cv::rectangle(imgFrame, rects[i], COLOUR_RED, 2);
+		// add tracking box
+	    cv::rectangle(imgFrame, rects[i], COLOUR_RED, 2);
 
-            // add tracking number
-            int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
-            double fontScale = 2;
-            int thickness = 3;
-            int baseline=0;
-            cv::Size textSize = cv::getTextSize(std::to_string(i), fontFace,
-                                        fontScale, thickness, &baseline);
-            cv::Point textOrg((rects[i].width - textSize.width)/2,
-                             (rects[i].height + textSize.height)/2);
+	    // add tracking number
+	    int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
+	    double fontScale = 2;
+	    int thickness = 3;
+	    int baseline=0;
+	    cv::Size textSize = cv::getTextSize(std::to_string(i), fontFace,
+					fontScale, thickness, &baseline);
+	    cv::Point textOrg((rects[i].width - textSize.width)/2,
+			     (rects[i].height + textSize.height)/2);
 
-            // add text
-            cv::putText(imgFrame, std::to_string(i), textOrg, fontFace, fontScale, cv::Scalar::all(255), thickness, 8);
-    }
+	    // add text
+	    cv::putText(imgFrame, std::to_string(i), textOrg, fontFace, fontScale, cv::Scalar::all(255), thickness, 8);
+	}
 
 
 }
@@ -594,31 +488,26 @@ void addROIToImage(cv::Mat &imgFrame, cv::Rect rects[], int rectsSize) {
 //  Motion Detection
 // --------------------------------------------------------------------------------------------
 
-void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, cv::Mat &imgOut2,int rows, int cols)
+void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, int rows, int cols)
 {
-	// variables for tracking motion
-	static unsigned short int motionDetectPrevResult [numOfMotionBoxes];
-	static unsigned short int motionDetectPresResult [numOfMotionBoxes];
-	static unsigned int trackingInts                 [numOfTrackingInts];
-	static unsigned int frameCnt=1;
-	//static cv::Mat oldImage;
+    // variables for tracking motion
+    static unsigned short int motionDetectPrevResult [numOfMotionBoxes];
+    static unsigned short int motionDetectPresResult [numOfMotionBoxes];
+    static unsigned int trackingInts                 [numOfTrackingInts];
+    static unsigned int frameCnt=1;
 
-
-	std::cout << "Frame numberyy: " << frameCnt << std::endl;
-
-
-	// image variables
+    // image variables
     cv::Mat imgGray;
     cv::Mat imgDilate0;
     cv::Mat imgDilate1;
     cv::Mat imgEdges;
     cv::Mat imgThreshold;
 
-	// ------------------------------------------
-	// Start Execution time
-	// ------------------------------------------
+    // ------------------------------------------
+    // Start Execution time
+    // ------------------------------------------
 
-	clock_t tStart = clock();
+    clock_t tStart = clock();
 
 
     // -------------------------------------------------------
@@ -634,7 +523,7 @@ void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, cv::Mat &imgOut2,int rows, i
     cv::Mat reducedGranularity = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(REDUCED_GRAN_BOX_SIZE, REDUCED_GRAN_BOX_SIZE));
 
     // Dilating and erode the images
-	cv::dilate(imgGray, imgDilate0, reducedGranularity);
+    cv::dilate(imgGray, imgDilate0, reducedGranularity);
 
     // -------------------------------------------------------
     //  Stage 3:  Create image of edge features
@@ -704,11 +593,6 @@ void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, cv::Mat &imgOut2,int rows, i
 
     // show image
     cv::imshow("Line Filter Image", orImages);
-    if(frameCnt>1){
-    	//cv::imshow("Old line filter image ", oldImage);
-    }
-
-
 
     // copy present value to previous array of values
     for(int i=0; i<numOfMotionBoxes; i++){
@@ -717,46 +601,32 @@ void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, cv::Mat &imgOut2,int rows, i
 	   motionDetectPresResult[i] = 0;
     }
 
-    /*std::cout << "Motion present result: " << motionDetectPresResult[7] << std::endl;
-    std::cout << "Motion previous result: " << motionDetectPrevResult[7] << std::endl;
-    std::cout << "Tracking result: "        << trackingInts[4] << std::endl;
-    std::cout << "Tracking result: "        << trackingInts[5] << std::endl;
-    std::cout << "Tracking result: "        << trackingInts[6] << std::endl;
-    std::cout << "Tracking result: "        << trackingInts[7] << std::endl;
-    std::cout << "Tracking result: "        << trackingInts[8] << std::endl;
-    std::cout << "Tracking result: "        << trackingInts[9] << std::endl;*/
+    // -------------------------------------------------------
+    //  Stage 5: Optical Flow
+    // -------------------------------------------------------
 
 	for(int row = 0; row < rows; row++) {
 		for(int col = 0; col < cols; col++) {
-                   //std::cout << "pixel number: " << col+(row*rows) << std::endl;
-
-
-				   // ------------------------------------
+			       
+			       // ------------------------------------
 			       //  Stage 0: Input pixel
 			       // ------------------------------------
 
-				   uchar processedPixel  = orImages.at<uchar>(row, col);
-				   int processedPixelValue  = (int)processedPixel;
-				   cv::Vec3b pixelIn0 = imgIn.at<cv::Vec3b>(row, col);
+			       uchar processedPixel  = orImages.at<uchar>(row, col);
+			       int processedPixelValue  = (int)processedPixel;
+			       cv::Vec3b pixelIn0 = imgIn.at<cv::Vec3b>(row, col);
 
-			       //std::cout << "pixel value: " << processedPixelValue << std::endl;
-
-
-
-				   // ------------------------------------
+			       // ------------------------------------
 			       //  Stage 1: Current Motion Box and tracker number
 			       // ------------------------------------
 
-			       //std::cout << "col: " << col << std::endl;
-			       //std::cout << "row: " << row << std::endl;
-				   int motionBoxNum = (col/motionBoxSize) + ((row/motionBoxSize)*(cols/motionBoxSize));
-                   int trackerNum   = (motionBoxNum/32);
-                   //std::cout << "Motion box number: " << motionBoxNum << std::endl;
-                   //std::cout << "Tracker number: " << trackerNum << std::endl;
 
-				   // ------------------------------------
-				   //   Stage 2: Set motion box to red
-				   // ------------------------------------
+			       int motionBoxNum = (col/motionBoxSize) + ((row/motionBoxSize)*(cols/motionBoxSize));
+		               int trackerNum   = (motionBoxNum/32);
+
+			       // ------------------------------------
+			       //   Stage 2: Set motion box to red
+			       // ------------------------------------
 
 
 				   int isSet = (trackingInts[trackerNum] >> (motionBoxNum%32)) & 0x1;
@@ -767,13 +637,6 @@ void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, cv::Mat &imgOut2,int rows, i
 					   // set red
 					   pixelIn0[0] = 0;
 					   pixelIn0[1] = 0;
-					   //pixelIn0[2] = pixelIn0[2]*1;
-					   //std::cout << "is set: " << motionBoxNum << std::endl;
-					   //std::cout << "tracker number: " << trackerNum << std::endl;
-					   //std::cout << "tracker value: " << trackingInts[trackerNum] << std::endl;
-					   //std::cout << "row: " << row << std::endl;
-					   //std::cout << "col: " << col << std::endl;
-
 				   }
 
 
@@ -781,86 +644,45 @@ void motionDection(cv::Mat &imgIn, cv::Mat &imgOut, cv::Mat &imgOut2,int rows, i
 				   // ------------------------------------
 				   //   Stage 3: Motion Detection
 				   // ------------------------------------
-				   if((frameCnt%3)==0){
-                   if(((col%motionBoxSize)==motionBoxSize-1) && ((row%motionBoxSize)==motionBoxSize-1)){
-					   //std::cout << "second branch" << std::endl;
+
+		                   if(((col%motionBoxSize)==motionBoxSize-1) && ((row%motionBoxSize)==motionBoxSize-1)){
 					   // add pixel value to count
 					   if(processedPixelValue>200){
 						   motionDetectPresResult[motionBoxNum] = motionDetectPresResult[motionBoxNum] + 1;
 					   }
 
 					   int SAD = abs(motionDetectPrevResult[motionBoxNum] - motionDetectPresResult[motionBoxNum]);
-                       //std::cout << "SAD" << motionBoxNum << " value: " << SAD << std::endl;
+
 					   if(SAD>20)
 					   {
-						   //std::cout << "SAD1!!!!" << motionBoxNum << " value: " << (1 << (motionBoxNum/32)) << std::endl;
 						   trackingInts[trackerNum] = trackingInts[trackerNum] | (1 << (motionBoxNum%32));
 					   }
 					   else{
 						   if(trackingInts[trackerNum]!=0){
-						   //std::cout << "SAD2!!!!" << motionBoxNum << " value: " <<  ~(1 << (motionBoxNum/32)) << std::endl;
-						   //std::cout << "SAD3!!!!" << motionBoxNum << " value: " <<  trackingInts[trackerNum] << std::endl;
-						   trackingInts[trackerNum] = trackingInts[trackerNum] & ~(1 << (motionBoxNum%32));
-						   //std::cout << "SAD4!!!!" << motionBoxNum << " value: " <<  trackingInts[trackerNum] << std::endl;
+						   	trackingInts[trackerNum] = trackingInts[trackerNum] & ~(1 << (motionBoxNum%32));
 						   }
 					   }
 				   }
 				   // Any other pixel
 				   else if(processedPixelValue>200)
 				   {
-					   //std::cout << "Third branch" << std::endl;
-					   //if(motionBoxNum==543){
-					   //   std::cout << "row: " << row << std::endl;
-					   //	   std::cout << "col: " << col << std::endl;
-					   //	   std::cout << "value: " <<  processedPixelValue << std::endl;
-					   //}
+
 					   motionDetectPresResult[motionBoxNum] = motionDetectPresResult[motionBoxNum] + 1;
 
-					   /*if(motionBoxNum==574)
-					   {
-						   std::cout << "col: " << col << std::endl;
-						   std::cout << "row: " << row << std::endl;
-						   std::cout << "value: " << processedPixelValue << std::endl;
-					   }*/
+
 				   }
-				   }
+
 
 				   // ------------------------------------
 				   //  Stage 4: Output pixel
 				   // ------------------------------------
 
-				   //std::cout << "pixel out: " << (int)pixelIn[2] << std::endl;
-
 				   imgOut.at<cv::Vec3b>(row, col) = pixelIn0;
-
-				   //if(row==400 && col==400)
-				   //{
-				   //  break;
-				   //}
-				}
-		   //if(row==400)
-		   //{
-		   //   break;
-		   //}
 		}
 
 	// increment frame count
 	frameCnt++;
 
-	// update old image
-	//oldImage = orImages.clone();
-
-	imgOut2 = orImages.clone();
-
-    for(int i=0; i<numOfMotionBoxes; i++){
-	   std::cout << "present motion box" << i << "value: " << motionDetectPresResult[i] << std::endl;
-	   std::cout << "previous motion box" << i << "value: " << motionDetectPrevResult[i] << std::endl;
-    }
-
-    for(int i=0; i<numOfTrackingInts; i++){
-	   std::cout << "tracking int" << i << "value: " << trackingInts[i] << std::endl;
-
-    }
 	// ------------------------------------------
 	// End Execution time
 	// ------------------------------------------
