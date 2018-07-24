@@ -10,29 +10,29 @@
 
 void vehicleCount(AXI_STREAM& stream_in, AXI_STREAM& stream_out, int& debug, int& result)
 {
-	// ----------------------------------------
-	//   directives
-	// ----------------------------------------
+    // ----------------------------------------
+    //   directives
+    // ----------------------------------------
 
-	// creates AXI stream ports
-	#pragma HLS INTERFACE axis register both port=stream_out
-	#pragma HLS INTERFACE axis register both port=stream_in
+    // creates AXI stream ports
+    #pragma HLS INTERFACE axis register both port=stream_out
+    #pragma HLS INTERFACE axis register both port=stream_in
 
-	// creates AXIS registers
-	#pragma HLS INTERFACE s_axilite port=result
-	#pragma HLS INTERFACE s_axilite port=debug
-	
-        // Removes ap_ctrl interface
-	#pragma HLS INTERFACE ap_ctrl_none port=return
+    // creates AXIS registers
+    #pragma HLS INTERFACE s_axilite port=result
+    #pragma HLS INTERFACE s_axilite port=debug
 
-	// Impoves synthesis flow
-        #pragma HLS dataflow
+    // Removes ap_ctrl interface
+    #pragma HLS INTERFACE ap_ctrl_none port=return
 
-	// ----------------------------------------
-	//   Constants
-	// ----------------------------------------
+    // Impoves synthesis flow
+    #pragma HLS dataflow
 
-	// Image width and height
+    // ----------------------------------------
+    //   Constants
+    // ----------------------------------------
+
+    // Image width and height
     int const rows = MAX_HEIGHT;
     int const cols = MAX_WIDTH;
 
@@ -48,9 +48,9 @@ void vehicleCount(AXI_STREAM& stream_in, AXI_STREAM& stream_out, int& debug, int
     const int numLeftLanes   = NUMLEFTLANES;
     const int numRightLanes  = NUMRIGHTLANES;
 
-	// ----------------------------------------
-	//   Local Storage
-	// ----------------------------------------
+    // ---------------------------------------- 
+    //   Local Storage
+    // ----------------------------------------
 
     RGB_IMAGE 	 imgRGB      		(rows, cols);
     RGB_IMAGE 	 imgDuplicate0      (rows, cols);
