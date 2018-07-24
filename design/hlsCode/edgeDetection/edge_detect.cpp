@@ -11,14 +11,14 @@
 
 void edge_detect(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
 {
-	// directives
-	#pragma HLS INTERFACE axis register both port=stream_out
-	#pragma HLS INTERFACE axis register both port=stream_in
+    // directives
+    #pragma HLS INTERFACE axis register both port=stream_out
+    #pragma HLS INTERFACE axis register both port=stream_in
 
-	// Removes ap_ctrl interface
-	#pragma HLS INTERFACE ap_ctrl_none port=return
+    // Removes ap_ctrl interface
+    #pragma HLS INTERFACE ap_ctrl_none port=return
 
-	// Synthesis data flow improvement
+    // Synthesis data flow improvement
     #pragma HLS dataflow
 
 	// Image width and height
