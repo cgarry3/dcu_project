@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//       DCU Custom Edge Detector Filter
+//       DCU Custom Corner Detector Filter
 //
 //  Author:       Cathal Garry
 //  Description:
@@ -10,7 +10,7 @@
 
 #include "hls_video.h"
 
-    // defines
+        // defines
 	#define MAX_HEIGHT 720
 	#define MAX_WIDTH  1280
 
