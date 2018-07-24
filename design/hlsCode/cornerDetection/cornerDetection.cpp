@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//       DCU Custom Edge Detector Filter
+//       DCU Custom Corner Detector Filter
 //
 //  Author:       Cathal Garry
 //  Description:
