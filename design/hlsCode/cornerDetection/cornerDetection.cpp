@@ -11,10 +11,10 @@ void cornerDetection(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
 {
 
     // ----------------------------------------
-	//  Local Storage
+    //  Local Storage
     // ----------------------------------------
 
-	// Image width and height
+    // Image width and height
     int const rows = MAX_HEIGHT;
     int const cols = MAX_WIDTH;
 
@@ -38,20 +38,20 @@ void cornerDetection(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
 
 
     // ----------------------------------------
-	//  Directives
+    //  Directives
     // ----------------------------------------
 
-	#pragma HLS INTERFACE axis register both port=stream_out
-	#pragma HLS INTERFACE axis register both port=stream_in
+    #pragma HLS INTERFACE axis register both port=stream_out
+    #pragma HLS INTERFACE axis register both port=stream_in
 
-	// Removes ap_ctrl interface
-	#pragma HLS INTERFACE ap_ctrl_none port=return
+    // Removes ap_ctrl interface
+    #pragma HLS INTERFACE ap_ctrl_none port=return
 
-	// Synthesis data flow improvement
+    // Synthesis data flow improvement
     #pragma HLS dataflow
 
-	// used to deal with delay between imgDuplicate1 and imgDuplicate0
-	#pragma HLS stream depth=20000 variable=imgDuplicate1.data_stream
+     // used to deal with delay between imgDuplicate1 and imgDuplicate0
+     #pragma HLS stream depth=20000 variable=imgDuplicate1.data_stream
 
     // ----------------------------------------
     //  Convert input stream
