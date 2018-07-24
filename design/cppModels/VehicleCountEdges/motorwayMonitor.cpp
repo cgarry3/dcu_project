@@ -321,11 +321,11 @@ void checkIfvehiclesCrossedOnLine(cv::Mat &imgFrame, int &result){
     cv::Mat imgEdges;
     cv::Mat imgThreshold;
 
-	// ------------------------------------------
-	// Start Execution time
-	// ------------------------------------------
+    // ------------------------------------------
+    // Start Execution time
+    // ------------------------------------------
 
-	clock_t tStart = clock();
+    clock_t tStart = clock();
 
     // -------------------------------------------------------
     //  Stage 1:  Turn Gray
@@ -428,11 +428,11 @@ void checkIfvehiclesCrossedOnLine(cv::Mat &imgFrame, int &result){
     	}
     }
 
-	// ------------------------------------------
-	// End Execution time
-	// ------------------------------------------
+    // ------------------------------------------
+    // End Execution time
+    // ------------------------------------------
 
-	printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+    printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 
 }
 
