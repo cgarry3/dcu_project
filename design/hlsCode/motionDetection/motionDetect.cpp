@@ -9,35 +9,31 @@
 
 void motionDetect(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
 {
-	// ----------------------------------------
-	//   directives
-	// ----------------------------------------
+    // ----------------------------------------
+    //   Directives
+    // ----------------------------------------
 
-	// creates AXI stream ports
-	#pragma HLS INTERFACE axis register both port=stream_out
-	#pragma HLS INTERFACE axis register both port=stream_in
-
-	// creates AXIS registers
-	//#pragma HLS INTERFACE s_axilite port=result
-	//#pragma HLS INTERFACE s_axilite port=debug
+    // creates AXI stream ports
+    #pragma HLS INTERFACE axis register both port=stream_out
+    #pragma HLS INTERFACE axis register both port=stream_in
 	
     // Removes ap_ctrl interface
-	#pragma HLS INTERFACE ap_ctrl_none port=return
+    #pragma HLS INTERFACE ap_ctrl_none port=return
 
-	// Impoves synthesis flow
+    // Impoves synthesis flow
     #pragma HLS dataflow
 
 
 
-	// ----------------------------------------
-	//   Local Storage
-	// ----------------------------------------
+    // ----------------------------------------
+    //   Local Storage
+    // ----------------------------------------
 
-	// RGB images
+    // RGB images
     RGB_IMAGE 	 imgRGB      		(rows, cols);
-    RGB_IMAGE 	 imgDuplicateRGB0   (rows, cols);
-    RGB_IMAGE 	 imgDuplicateRGB1   (rows, cols);
-    RGB_IMAGE 	 imgLines           (rows, cols);
+    RGB_IMAGE 	 imgDuplicateRGB0       (rows, cols);
+    RGB_IMAGE 	 imgDuplicateRGB1       (rows, cols);
+    RGB_IMAGE 	 imgLines               (rows, cols);
     RGB_IMAGE 	 imgOut      		(rows, cols);
 
     // Single frame images
@@ -45,12 +41,12 @@ void motionDetect(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
     SINGLE_IMAGE 	 imgDilate  			(rows, cols);
     SINGLE_IMAGE 	 imgEdges   			(rows, cols);
     SINGLE_IMAGE 	 imgThres    			(rows, cols);
-    SINGLE_IMAGE 	 imgThresLine45Thin    	(rows, cols);
-    SINGLE_IMAGE 	 imgThresLine45Thick    (rows, cols);
-    SINGLE_IMAGE 	 imgThresLine90Thin    	(rows, cols);
-    SINGLE_IMAGE 	 imgThresLine90Thick    (rows, cols);
-    SINGLE_IMAGE 	 imgThresLine135Thin    (rows, cols);
-    SINGLE_IMAGE 	 imgThresLine135Thick   (rows, cols);
+    SINGLE_IMAGE 	 imgThresLine45Thin    	        (rows, cols);
+    SINGLE_IMAGE 	 imgThresLine45Thick            (rows, cols);
+    SINGLE_IMAGE 	 imgThresLine90Thin    	        (rows, cols);
+    SINGLE_IMAGE 	 imgThresLine90Thick            (rows, cols);
+    SINGLE_IMAGE 	 imgThresLine135Thin            (rows, cols);
+    SINGLE_IMAGE 	 imgThresLine135Thick           (rows, cols);
     SINGLE_IMAGE 	 imgClear    			(rows, cols);
     SINGLE_IMAGE 	 imgDuplicate0    		(rows, cols);
     SINGLE_IMAGE 	 imgDuplicate1    		(rows, cols);
@@ -60,8 +56,8 @@ void motionDetect(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
     SINGLE_IMAGE 	 imgLineThin90    		(rows, cols);
     SINGLE_IMAGE 	 imgLineThick90    		(rows, cols);
     SINGLE_IMAGE 	 imgLineThin135    		(rows, cols);
-    SINGLE_IMAGE 	 imgLineThick135    	(rows, cols);
-    SINGLE_IMAGE 	 imgOR0 		   		(rows, cols);
+    SINGLE_IMAGE 	 imgLineThick135    	        (rows, cols);
+    SINGLE_IMAGE 	 imgOR0 		   	(rows, cols);
     SINGLE_IMAGE 	 imgOR1	    			(rows, cols);
 
 
@@ -156,17 +152,17 @@ void motionDetect(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
 void opticalFlow(RGB_IMAGE& imgIn0, RGB_IMAGE& imgIn1, RGB_IMAGE& imgOut, int rows, int cols)
 {
 
-	// local pixel storage
-	RGB_PIXEL pin1;
-	RGB_PIXEL  pin0;
-	RGB_PIXEL  pout;
+   // local pixel storage
+   RGB_PIXEL pin1;
+   RGB_PIXEL  pin0;
+   RGB_PIXEL  pout;
 
 
-	// variables for tracking motion
-	static unsigned short int motionDetectPrevResult [numOfMotionBoxes];
-	static unsigned short int motionDetectPresResult [numOfMotionBoxes];
-	static unsigned int trackingInts                 [numOfTrackingInts];
-	static unsigned int frameCnt=1;
+    // variables for tracking motion
+    static unsigned short int motionDetectPrevResult [numOfMotionBoxes];
+    static unsigned short int motionDetectPresResult [numOfMotionBoxes];
+    static unsigned int trackingInts                 [numOfTrackingInts];
+    static unsigned int frameCnt=1;
 
     // copy present value to previous array of values
     for(int i=0; i<numOfMotionBoxes; i++){
@@ -183,19 +179,19 @@ void opticalFlow(RGB_IMAGE& imgIn0, RGB_IMAGE& imgIn1, RGB_IMAGE& imgOut, int ro
 		#pragma HLS LOOP_TRIPCOUNT min=1 max=1920
 		#pragma HLS pipeline rewind
 
-				   // ------------------------------------
+			       // ------------------------------------
 			       //  Stage 0: Input pixel
 			       // ------------------------------------
 
 				   imgIn0 >> pin0;
 				   imgIn1 >> pin1;
 
-				   // ------------------------------------
+			       // ------------------------------------
 			       //  Stage 1: Current Motion Box and tracker number
 			       // ------------------------------------
 
 				   int motionBoxNum = (col/motionBoxSize) + ((row/motionBoxSize)*(cols/motionBoxSize));
-                   int trackerNum   = (motionBoxNum/32);
+                                   int trackerNum   = (motionBoxNum/32);
 
 				   // ------------------------------------
 				   //   Stage 2: Set motion box to red
@@ -222,7 +218,7 @@ void opticalFlow(RGB_IMAGE& imgIn0, RGB_IMAGE& imgIn1, RGB_IMAGE& imgOut, int ro
 				   // ------------------------------------
 
 				   // Last pixel in a motion box
-                   if(((col%motionBoxSize)==motionBoxSize-1) && ((row%motionBoxSize)==motionBoxSize-1)){
+                                   if(((col%motionBoxSize)==motionBoxSize-1) && ((row%motionBoxSize)==motionBoxSize-1)){
 					   // add pixel value to count
 					   if(pin0.val[0]>200){
 						   motionDetectPresResult[motionBoxNum] = motionDetectPresResult[motionBoxNum] + 1;
