@@ -1,3 +1,12 @@
+// =======================================================
+// Author:       Cathal Garry
+// Email:        cathal.garry3@mail.dcu.ie
+// Date:         10 Dec 2017
+// Description:  This is program takes in a image and 
+//               detects all the images in the file using
+//               the sobel filter
+// ========================================================
+
 #include <opencv2/opencv.hpp>
 #include <time.h>
 
@@ -13,10 +22,10 @@ int main()
 	// Images
 	// ------------------------------------------
 
-    Mat imgIn;
-    Mat imgGray;
-    Mat imgDilate;
-    Mat imgEdges;
+        Mat imgIn;
+        Mat imgGray;
+        Mat imgDilate;
+        Mat imgEdges;
 
 	// ------------------------------------------
 	// Start Execution time
@@ -30,19 +39,19 @@ int main()
 
 
 	string testImage = "C:\\Users\\cgarry\\Google Drive\\dcu_masters\\project\\design\\image_algorthim\\data\\eval\\testImage_1080p.jpg";
-    imgIn = imread(testImage, CV_LOAD_IMAGE_COLOR);   // Read the file
+        imgIn = imread(testImage, CV_LOAD_IMAGE_COLOR);   // Read the file
 
 	// ------------------------------------------
 	// Convert RGB Image to Grayscale
 	// ------------------------------------------
 
-    cvtColor( imgIn, imgGray, cv::COLOR_BGR2GRAY );
+        cvtColor( imgIn, imgGray, cv::COLOR_BGR2GRAY );
 
 	// ------------------------------------------
 	// Dilate image
 	// ------------------------------------------
 
-    Mat reducedGranularity = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(REDUCED_GRAN_BOX_SIZE, REDUCED_GRAN_BOX_SIZE));
+        Mat reducedGranularity = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(REDUCED_GRAN_BOX_SIZE, REDUCED_GRAN_BOX_SIZE));
 
 	cv::dilate(imgGray, imgDilate, reducedGranularity);
 
@@ -50,7 +59,7 @@ int main()
 	// Edge Detection
 	// ------------------------------------------
 
-    cv::Sobel(imgDilate,imgEdges, CV_8U, 1, 0);
+        cv::Sobel(imgDilate,imgEdges, CV_8U, 1, 0);
 
 	// ------------------------------------------
 	// End Execution time
