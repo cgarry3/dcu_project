@@ -1,3 +1,11 @@
+// =======================================================
+// Author:       Cathal Garry
+// Email:        cathal.garry3@mail.dcu.ie
+// Date:         10 July 2018
+// Description:  This is program convert an RGB image to
+//               grayscale
+// ========================================================
+
 #include <opencv2/opencv.hpp>
 #include <time.h>
 
@@ -23,7 +31,7 @@ int main()
 	// Convert RGB Image to Grayscale
 	// ------------------------------------------
 
-    IplImage *im_gray = cvCreateImage(cvGetSize(im_rgb),IPL_DEPTH_8U,1);
+        IplImage *im_gray = cvCreateImage(cvGetSize(im_rgb),IPL_DEPTH_8U,1);
 	cvCvtColor(im_rgb,im_gray,CV_RGB2GRAY);
 
 	// ------------------------------------------
