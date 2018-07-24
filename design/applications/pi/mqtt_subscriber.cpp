@@ -1,4 +1,10 @@
-// Based on the Paho C code example from www.eclipse.org/paho/
+// ------------------------------------------------
+//          MQTT Subscriber
+//  Description: MQTT subscriber used for monitoring
+//               traffic on a motorway.
+//
+// -------------------------------------------------
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -12,6 +18,7 @@
 
 using namespace std;
 
+// MQTTT defines
 #define ADDRESS     "tcp://192.168.0.29:1883"
 #define CLIENTID    "rpi"
 #define AUTHMETHOD  "garryc3"
