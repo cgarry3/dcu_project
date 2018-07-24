@@ -9,36 +9,36 @@
 
 void whiteLineDetect(AXI_STREAM& stream_in, AXI_STREAM& stream_out)
 {
-	// ----------------------------------------
-	//   directives
-	// ----------------------------------------
+    // ----------------------------------------
+    //   directives
+    // ----------------------------------------
 
-	// creates AXI stream ports
-	#pragma HLS INTERFACE axis register both port=stream_out
-	#pragma HLS INTERFACE axis register both port=stream_in
+    // creates AXI stream ports
+    #pragma HLS INTERFACE axis register both port=stream_out
+    #pragma HLS INTERFACE axis register both port=stream_in
 
-	// creates AXIS registers
-	#pragma HLS INTERFACE s_axilite port=result
-	#pragma HLS INTERFACE s_axilite port=debug
+    // creates AXIS registers
+    #pragma HLS INTERFACE s_axilite port=result
+    #pragma HLS INTERFACE s_axilite port=debug
 
     // Removes ap_ctrl interface
-	#pragma HLS INTERFACE ap_ctrl_none port=return
+    #pragma HLS INTERFACE ap_ctrl_none port=return
 
-	// Impoves synthesis flow
+    // Impoves synthesis flow
     #pragma HLS dataflow
 
-	// ----------------------------------------
-	//   Constants
-	// ----------------------------------------
+    // ----------------------------------------
+    //   Constants
+    // ----------------------------------------
 
-	// Image width and height
+    // Image width and height
     int const rows = MAX_HEIGHT;
     int const cols = MAX_WIDTH;
 
 
-	// ----------------------------------------
-	//   Local Storage
-	// ----------------------------------------
+   // ----------------------------------------
+   //   Local Storage
+   // ----------------------------------------
 
 
     RGB_IMAGE 	 imgRGB      		(rows, cols);
@@ -170,7 +170,7 @@ void removeIllumation(RGB_IMAGE& imgIn, RGB_IMAGE& imgOut, int rows, int cols)
 		RGB_IMAGE       YCrCb_IMAGE_merge  (rows, cols);
 
 		// --------------------------------------------------
-        // Split chrome and luma
+                // Split chrome and luma
 		// --------------------------------------------------
 
 		hls::CvtColor<HLS_RGB2YCrCb>(imgIn, YCrCb_IMAGE_in);
@@ -242,21 +242,21 @@ void removeShadows(RGB_IMAGE& imgIn, RGB_IMAGE& imgOut, int rows, int cols)
 
 void removeShadowSingleFrame(SINGLE_IMAGE& imgIn, SINGLE_IMAGE& imgOut, int rows, int cols)
 {
-		// --------------------------------------------------
-		// Image Storage
-		// --------------------------------------------------
+	// --------------------------------------------------
+	// Image Storage
+	// --------------------------------------------------
 
-		SINGLE_IMAGE       imgDuplicate0    (rows, cols);
-		SINGLE_IMAGE       imgDuplicate1    (rows, cols);
-		SINGLE_IMAGE       imgDilate        (rows, cols);
-		SINGLE_IMAGE       imgBlur          (rows, cols);
-		SINGLE_IMAGE       imgDiff          (rows, cols);
+	SINGLE_IMAGE       imgDuplicate0    (rows, cols);
+	SINGLE_IMAGE       imgDuplicate1    (rows, cols);
+	SINGLE_IMAGE       imgDilate        (rows, cols);
+	SINGLE_IMAGE       imgBlur          (rows, cols);
+	SINGLE_IMAGE       imgDiff          (rows, cols);
 
-    // --------------------------------------------------
-		//  Removing Shadow
-		// --------------------------------------------------
+        // --------------------------------------------------
+	//  Removing Shadow
+	// --------------------------------------------------
 
-		hls::Duplicate(imgIn, imgDuplicate0, imgDuplicate1);
+	hls::Duplicate(imgIn, imgDuplicate0, imgDuplicate1);
         hls::Dilate(imgDuplicate0,imgDilate);
         hls::GaussianBlur<21,21>(imgDilate,imgBlur);
         hls::AbsDiff(imgBlur, imgDuplicate1, imgDiff);
