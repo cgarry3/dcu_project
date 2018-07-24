@@ -1,3 +1,11 @@
+// -------------------------------------------------------------------------
+//       DCU Custom RGB to Grayscale Filter
+//
+//  Author:       Cathal Garry
+//  Description:  This is a tesbench for the RGB to grayscale filter
+//
+// -------------------------------------------------------------------------
+
 #include <opencv2/opencv.hpp>
 #include "rgb2grayScale.h"
 #include "hls_opencv.h"
