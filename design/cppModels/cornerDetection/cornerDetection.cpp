@@ -172,9 +172,9 @@ int main(void) {
 void addCountToImage(int leftLaneVehicleCount,int rightLaneVehicleCount, cv::Mat &imgFrame) {
 
 
-	// -------------------------------------------
-	// Adding Left Lane Vehicle Count
-	// -------------------------------------------
+    // -------------------------------------------
+    // Adding Left Lane Vehicle Count
+    // -------------------------------------------
 
     int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
     double dblFontScale = (imgFrame.rows * imgFrame.cols) / 300000.0;
@@ -189,9 +189,9 @@ void addCountToImage(int leftLaneVehicleCount,int rightLaneVehicleCount, cv::Mat
 
     cv::putText(imgFrame, std::to_string(leftLaneVehicleCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, COLOUR_GREEN, intFontThickness);
 
-	// -------------------------------------------
-	// Adding Left Lane Vehicle Count
-	// -------------------------------------------
+    // -------------------------------------------
+    // Adding Left Lane Vehicle Count
+    // -------------------------------------------
 
     textSize = cv::getTextSize(std::to_string(leftLaneVehicleCount), intFontFace, dblFontScale, intFontThickness, 0);
 
@@ -212,11 +212,11 @@ void cornerDetection(cv::Mat &imgIn, cv::Mat &imgOut, int rows, int cols)
 {
 
 	// image variables
-    cv::Mat imgGray;
+        cv::Mat imgGray;
 
-    // threshold values
-    int thresh = 75;
-    int max_thresh = 255;
+        // threshold values
+        int thresh = 75;
+        int max_thresh = 255;
 
 	// ------------------------------------------
 	// Start Execution time
