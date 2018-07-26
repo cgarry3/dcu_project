@@ -44,11 +44,11 @@ volatile MQTTClient_deliveryToken deliveredtoken;
 // ---------------------------------------------
 // Congestion Delay:
 // Time take for car to pass(seconds)
-// 10 = Accident has occured (50kph)
-// 7 = Very slow traffic or possible accident (80kph)
-// 5 = High Traffic  (80kph)
-// 2 = Medium flow of traffic (100kph)
-// 1  = fast flow of traffic (120kph)
+// 4 = Accident has occured (50kph)
+// 3 = Very slow traffic or possible accident (80kph)
+// 2 = High Traffic  (80kph)
+// 1 = Medium flow of traffic (100kph)
+// 0  = fast flow of traffic (120kph)
 // ---------------------------------------------
 
 int congestionRate[SAMPLE_SIZE];
@@ -81,23 +81,23 @@ int updateMotorWaySpeed()
 
     // new motorway speed based on the average
     // Fast flow of traffic
-    if(average<=1){
+    if(average<=0){
         motorway_speed = 120; 
     }
     // Medium flow of traffic
-    else if(average<=2){
+    else if(average<=1){
         motorway_speed = 100; 
     }
     // High Traffic
-    else if(average<=5){
+    else if(average<=2){
         motorway_speed = 80; 
     }
     // Very slow traffic or possible accident
-    else if(average<=8){
+    else if(average<=3){
         motorway_speed = 80; 
     }
     // Accident has Occured 
-    else if(average>=8){
+    else if(average>=4){
         motorway_speed = 50; 
     }
     // Default
