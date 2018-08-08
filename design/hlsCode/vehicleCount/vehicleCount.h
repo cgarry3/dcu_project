@@ -21,16 +21,35 @@
 	#define MAX_WIDTH 1280
 
 	// function defines
+    // ROI 720p
+#if MAX_HEIGHT==720
 	#define ROIWIDTH     50
 	#define ROIHEIGHT    25
 
 	#define ROILeftLaneY   410
-	#define ROILeftLaneX   350
+	#define ROILeftLaneX   340
 	#define ROIStrideLeft  80
 
 	#define ROIRightLaneY   410
 	#define ROIRightLaneX   710
 	#define ROIStrideRight  80
+#endif
+
+
+    // ROI 1080p
+#if MAX_HEIGHT==1080
+	#define ROIWIDTH     50
+	#define ROIHEIGHT    25
+
+	#define ROILeftLaneY   650
+	#define ROILeftLaneX   450
+	#define ROIStrideLeft  150
+
+	#define ROIRightLaneY   650
+	#define ROIRightLaneX   1090
+	#define ROIStrideRight  150
+#endif
+
 
 	#define NUMLEFTLANES   3
 	#define NUMRIGHTLANES  3
@@ -49,23 +68,16 @@
 	//  Functions
 	// ----------------------------------------
 
-	void vehicleCount(AXI_STREAM& stream_in, AXI_STREAM& stream_out, int& debug, int& result);
+	void vehicleCount(AXI_STREAM& stream_in, AXI_STREAM& stream_out, int& leftLaneCount,
+			          int& rightLaneCount, int& result);
 
 	template<typename IMG_T, typename PIXEL_T>
-	void detectVehicleInLane(
-				IMG_T& img_in0,
-				IMG_T& img_in1,
-				IMG_T& img_out,
-				int rows,
-				int cols,
-				int& debug,
-				int& result);
+	void detectVehicleInLane(IMG_T& img_in, IMG_T& img_out, int rows, int cols,
+				             int& leftLaneCount, int& rightLaneCount, int& result);
 
-	void replicate(
-				RGB_IMAGE& img_in,
-				RGB_IMAGE& img_out0,
-				RGB_IMAGE& img_out1,
-				int rows,
-				int cols);
+	template<typename IMG_T>
+	void edge_detect(IMG_T& imgInput, IMG_T& imgOutput);
+
+
 
 #endif
