@@ -113,103 +113,6 @@ int main(void) {
     capVideo.read(inpuFrame1);
 
 
-    // ------------------------------
-    //  Vehicle Count Lines
-    // ------------------------------
-
-
-    // States specific to the video
-    int countLinePosition = 396;//(int)std::round((double)inpuFrame1.rows * 0.55);
-    int leftLane0 = 330;
-    int leftLane1 = 420;
-    int leftLane2 = 510;
-    int rightLane0 = 720;
-    int rightLane1 = 800;
-    int rightLane2 = 880;
-
-
-    // regions of interest width and height
-    int width  = 40;
-    int height = 25;
-
-    // left lane 0
-    cv::Point ROIL0P0 = cv::Point(leftLane0,countLinePosition);
-    cv::Point ROIL0P1 = cv::Point(leftLane0+width,countLinePosition);
-    cv::Point ROIL0P2 = cv::Point(leftLane0,countLinePosition+height);
-    cv::Point ROIL0P3 = cv::Point(leftLane0+width,countLinePosition+height);
-    std::vector<cv::Point> points0;
-    points0.push_back(ROIL0P0);
-    points0.push_back(ROIL0P1);
-    points0.push_back(ROIL0P2);
-    points0.push_back(ROIL0P3);
-    cv::Rect leftLane0Rect =  cv::boundingRect(points0);
-
-    // left lane 1
-    cv::Point ROIL1P0 = cv::Point(leftLane1,countLinePosition);
-    cv::Point ROIL1P1 = cv::Point(leftLane1+width,countLinePosition);
-    cv::Point ROIL1P2 = cv::Point(leftLane1,countLinePosition+height);
-    cv::Point ROIL1P3 = cv::Point(leftLane1+width,countLinePosition+height);
-    std::vector<cv::Point> points1;
-    points1.push_back(ROIL1P0);
-    points1.push_back(ROIL1P1);
-    points1.push_back(ROIL1P2);
-    points1.push_back(ROIL1P3);
-    cv::Rect leftLane1Rect =  cv::boundingRect(points1);
-
-    // left lane 2
-    cv::Point ROIL2P0 = cv::Point(leftLane2,countLinePosition);
-    cv::Point ROIL2P1 = cv::Point(leftLane2+width,countLinePosition);
-    cv::Point ROIL2P2 = cv::Point(leftLane2,countLinePosition+height);
-    cv::Point ROIL2P3 = cv::Point(leftLane2+width,countLinePosition+height);
-    std::vector<cv::Point> points2;
-    points2.push_back(ROIL2P0);
-    points2.push_back(ROIL2P1);
-    points2.push_back(ROIL2P2);
-    points2.push_back(ROIL2P3);
-    cv::Rect leftLane2Rect =  cv::boundingRect(points2);
-
-    // right lane 0
-    cv::Point ROIL3P0 = cv::Point(rightLane0,countLinePosition);
-    cv::Point ROIL3P1 = cv::Point(rightLane0+width,countLinePosition);
-    cv::Point ROIL3P2 = cv::Point(rightLane0,countLinePosition+height);
-    cv::Point ROIL3P3 = cv::Point(rightLane0+width,countLinePosition+height);
-    std::vector<cv::Point> points3;
-    points3.push_back(ROIL3P0);
-    points3.push_back(ROIL3P1);
-    points3.push_back(ROIL3P2);
-    points3.push_back(ROIL3P3);
-    cv::Rect rightLane0Rect =  cv::boundingRect(points3);
-
-    // right lane 1
-    cv::Point ROIL4P0 = cv::Point(rightLane1,countLinePosition);
-    cv::Point ROIL4P1 = cv::Point(rightLane1+width,countLinePosition);
-    cv::Point ROIL4P2 = cv::Point(rightLane1,countLinePosition+height);
-    cv::Point ROIL4P3 = cv::Point(rightLane1+width,countLinePosition+height);
-    std::vector<cv::Point> points4;
-    points4.push_back(ROIL4P0);
-    points4.push_back(ROIL4P1);
-    points4.push_back(ROIL4P2);
-    points4.push_back(ROIL4P3);
-    cv::Rect rightLane1Rect =  cv::boundingRect(points4);
-
-    // right lane 2
-    cv::Point ROIL5P0 = cv::Point(rightLane2,countLinePosition);
-    cv::Point ROIL5P1 = cv::Point(rightLane2+width,countLinePosition);
-    cv::Point ROIL5P2 = cv::Point(rightLane2,countLinePosition+height);
-    cv::Point ROIL5P3 = cv::Point(rightLane2+width,countLinePosition+height);
-    std::vector<cv::Point> points5;
-    points5.push_back(ROIL5P0);
-    points5.push_back(ROIL5P1);
-    points5.push_back(ROIL5P2);
-    points5.push_back(ROIL5P3);
-    cv::Rect rightLane2Rect =  cv::boundingRect(points5);
-
-    // array of ROIs
-    int rectsSize = 6;
-    cv::Rect rects[] = {leftLane0Rect, leftLane1Rect, leftLane2Rect, rightLane0Rect, rightLane1Rect, rightLane2Rect};
-
-
-
     // ---------------------------------------------------------------------
     //  Testbench Execution
     // ---------------------------------------------------------------------
@@ -224,150 +127,36 @@ int main(void) {
         // -------------------------------------------------------
 
         int result;
-        int debug=0;
+        int leftCount;
+        int rightCount;
 
         // DUT
         AXI_STREAM stream_in, stream_out;
         cvMat2AXIvideo(imgIn, stream_in);
-        vehicleCount(stream_in, stream_out, debug,result);
+        vehicleCount(stream_in, stream_out, leftCount, rightCount,result);
         AXIvideo2cvMat(stream_out, imgOut);
-
-        cv::imwrite("C:\\Users\\cgarry\\Google Drive\\dcu_masters\\project\\design\\image_algorthim\\data\\test.jpg", imgOut);
 
         // -------------------------------------------------------
         //  Step 2: Process result from DUT
         // -------------------------------------------------------
 
         std::cout << "Result is: " << result << std::endl;
+        std::cout << "Left count is: " << leftCount << std::endl;
+        std::cout << "Right count is: " << rightCount << std::endl;
 
-        if((result&0x1)==1)
-        {
-        	// if its been 5 frames since the line was crossed increase count
-        	// otherwise assume it is the same car
-			if(M6LeftLane0.getNumberOfFramesSinceLineCrossed()>10)
-			{
-				M6LeftLane0.setNumberOfVehiclesPassed(M6LeftLane0.getNumberOfVehiclesPassed()+1);
-	        	// frames back to 0
-				M6LeftLane0.setNumberOfFramesSinceLineCrossed(0);
-			}
-        }
-        else
-        {
-        	// if no car is seen increase the number of frames since
-        	// the line was crossed
-        	M6LeftLane0.setNumberOfFramesSinceLineCrossed(M6LeftLane0.getNumberOfFramesSinceLineCrossed()+1);
-        }
 
-        if((result&0x2)==2)
-        {
-        	// if its been 5 frames since the line was crossed increase count
-        	// otherwise assume it is the same car
-			if(M6LeftLane1.getNumberOfFramesSinceLineCrossed()>10)
-			{
-				M6LeftLane1.setNumberOfVehiclesPassed(M6LeftLane1.getNumberOfVehiclesPassed()+1);
-	        	// frames back to 0
-				M6LeftLane1.setNumberOfFramesSinceLineCrossed(0);
-			}
-        }
-        else
-        {
-        	// if no car is seen increase the number of frames since
-        	// the line was crossed
-        	M6LeftLane1.setNumberOfFramesSinceLineCrossed(M6LeftLane1.getNumberOfFramesSinceLineCrossed()+1);
-        }
 
-        if((result&0x4)==4)
-        {
-        	// if its been 5 frames since the line was crossed increase count
-        	// otherwise assume it is the same car
-			if(M6LeftLane2.getNumberOfFramesSinceLineCrossed()>10)
-			{
-				M6LeftLane2.setNumberOfVehiclesPassed(M6LeftLane2.getNumberOfVehiclesPassed()+1);
-	        	// frames back to 0
-				M6LeftLane2.setNumberOfFramesSinceLineCrossed(0);
-			}
-        }
-        else
-        {
-        	// if no car is seen increase the number of frames since
-        	// the line was crossed
-        	M6LeftLane2.setNumberOfFramesSinceLineCrossed(M6LeftLane2.getNumberOfFramesSinceLineCrossed()+1);
-        }
-
-        // right lane
-        if((result&0x8)==8)
-        {
-        	// if its been 5 frames since the line was crossed increase count
-        	// otherwise assume it is the same car
-			if(M6RightLane0.getNumberOfFramesSinceLineCrossed()>10)
-			{
-				M6RightLane0.setNumberOfVehiclesPassed(M6RightLane0.getNumberOfVehiclesPassed()+1);
-	        	// frames back to 0
-				M6RightLane0.setNumberOfFramesSinceLineCrossed(0);
-			}
-        }
-        else
-        {
-        	// if no car is seen increase the number of frames since
-        	// the line was crossed
-        	M6RightLane0.setNumberOfFramesSinceLineCrossed(M6RightLane0.getNumberOfFramesSinceLineCrossed()+1);
-        }
-
-        if((result&0x16)==16)
-        {
-        	// if its been 5 frames since the line was crossed increase count
-        	// otherwise assume it is the same car
-			if(M6RightLane1.getNumberOfFramesSinceLineCrossed()>10)
-			{
-				M6RightLane1.setNumberOfVehiclesPassed(M6RightLane1.getNumberOfVehiclesPassed()+1);
-	        	// frames back to 0
-				M6RightLane1.setNumberOfFramesSinceLineCrossed(0);
-			}
-        }
-        else
-        {
-        	// if no car is seen increase the number of frames since
-        	// the line was crossed
-        	M6RightLane1.setNumberOfFramesSinceLineCrossed(M6RightLane1.getNumberOfFramesSinceLineCrossed()+1);
-        }
-
-        if((result&0x32)==32)
-        {
-        	// if its been 5 frames since the line was crossed increase count
-        	// otherwise assume it is the same car
-			if(M6RightLane2.getNumberOfFramesSinceLineCrossed()>10)
-			{
-				M6RightLane2.setNumberOfVehiclesPassed(M6RightLane2.getNumberOfVehiclesPassed()+1);
-	        	// frames back to 0
-				M6RightLane2.setNumberOfFramesSinceLineCrossed(0);
-			}
-        }
-        else
-        {
-        	// if no car is seen increase the number of frames since
-        	// the line was crossed
-        	M6RightLane2.setNumberOfFramesSinceLineCrossed(M6RightLane2.getNumberOfFramesSinceLineCrossed()+1);
-        }
 
         // -------------------------------------------------------
         //  Step 3: Display Images with information
         // -------------------------------------------------------
 
-        // show regions of interest and cout
-        // add count to input image
-        int leftCount = M6LeftLane0.getNumberOfVehiclesPassed() + M6LeftLane1.getNumberOfVehiclesPassed() + M6LeftLane2.getNumberOfVehiclesPassed();
-        int rightCount = M6RightLane0.getNumberOfVehiclesPassed() + M6RightLane1.getNumberOfVehiclesPassed() + M6RightLane2.getNumberOfVehiclesPassed();
+        // Add count to input image
         addCountToImage( leftCount , rightCount, imgIn);
+        cv::imshow("Vehicle Counts", imgIn);
 
-        // add ROI to input image
-        addROIToImage(imgIn, rects, rectsSize);
-
-        cv::imshow("ROI of Interests", imgIn);
-
-        // show output from DUT
+        // Show output from DUT
         cv::imshow("DUT output Image", imgOut);
-
-        cv::imwrite("C:\\Users\\cgarry\\Google Drive\\dcu_masters\\project\\design\\image_algorthim\\data\\test.jpg", imgOut);
 
         // -------------------------------------------------------
         //  Step 4: Update for next iteration
@@ -428,37 +217,6 @@ void addCountToImage(int leftLaneVehicleCount,int rightLaneVehicleCount, cv::Mat
 
 }
 
-// --------------------------------------------------------------------------------------------
-// Add Info To image
-// --------------------------------------------------------------------------------------------
-
-void addROIToImage(cv::Mat &imgFrame, cv::Rect rects[], int rectsSize) {
-
-	// -------------------------------------------
-	// Adding regular box to Vehicles on image
-	// -------------------------------------------
-
-    for (int i = 0; i < rectsSize; i++) {
-
-        	// add tracking box
-            cv::rectangle(imgFrame, rects[i], COLOUR_RED, 2);
-
-            // add tracking number
-            int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
-            double fontScale = 2;
-            int thickness = 3;
-            int baseline=0;
-            cv::Size textSize = cv::getTextSize(NumberToString(i), fontFace,
-                                        fontScale, thickness, &baseline);
-            cv::Point textOrg((rects[i].width - textSize.width)/2,
-                             (rects[i].height + textSize.height)/2);
-
-            // add text
-            cv::putText(imgFrame, NumberToString(i), textOrg, fontFace, fontScale, cv::Scalar::all(255), thickness, 8);
-    }
-
-
-}
 
 string NumberToString ( int Number )
  {
