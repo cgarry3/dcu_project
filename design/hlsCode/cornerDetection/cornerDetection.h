@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//       DCU Custom Corner Detector Filter
+//       DCU Custom Edge Detector Filter
 //
 //  Author:       Cathal Garry
 //  Description:
@@ -10,9 +10,9 @@
 
 #include "hls_video.h"
 
-        // defines
-	#define MAX_HEIGHT 720
-	#define MAX_WIDTH  1280
+    // defines
+	#define MAX_HEIGHT 1080
+	#define MAX_WIDTH  1920
 
 
 	// types
@@ -27,7 +27,10 @@
 	void cornerDetection(AXI_STREAM& stream_in, AXI_STREAM& stream_out);
 
 	template<typename IMG_T, typename PIXEL_T>
-	void setCornersRed(IMG_T& img_in0, IMG_T& img_in1, IMG_T& img_out, int rows, int cols);
+	void combineCornersEdges(IMG_T& img_in0, IMG_T& img_in1, IMG_T& img_out, int rows, int cols);
+
+	template<typename IMG_T>
+	void edge_detect(IMG_T& imgInput, IMG_T& imgOutput);
 
 
 #endif
