@@ -14,10 +14,9 @@ int main()
 	// Images
 	// ------------------------------------------
 
-    Mat imgIn;
-    Mat imgGray;
-    Mat imgDilate;
-    Mat imgEdges;
+        Mat imgIn;
+        Mat imgGray;
+        Mat imgDilate;
 
 	// ------------------------------------------
 	// Start Execution time
@@ -31,19 +30,19 @@ int main()
 
 
 	string testImage = "/home/xilinx/work/test/eval/testImage_720p.jpg";
-    imgIn = imread(testImage, CV_LOAD_IMAGE_COLOR);   // Read the file
+        imgIn = imread(testImage, CV_LOAD_IMAGE_COLOR);   // Read the file
 
 	// ------------------------------------------
 	// Convert RGB Image to Grayscale
 	// ------------------------------------------
 
-    cvtColor( imgIn, imgGray, cv::COLOR_BGR2GRAY );
+        cvtColor( imgIn, imgGray, cv::COLOR_BGR2GRAY );
 
 	// ------------------------------------------
 	// Dilate image
 	// ------------------------------------------
 
-    Mat reducedGranularity = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(REDUCED_GRAN_BOX_SIZE, REDUCED_GRAN_BOX_SIZE));
+        Mat reducedGranularity = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(REDUCED_GRAN_BOX_SIZE, REDUCED_GRAN_BOX_SIZE));
 
 	cv::dilate(imgGray, imgDilate, reducedGranularity);
 
@@ -51,7 +50,20 @@ int main()
 	// Edge Detection
 	// ------------------------------------------
 
-    cv::Sobel(imgDilate,imgEdges, CV_8U, 1, 0);
+	// Storage
+	cv::Mat grad_x, grad_y, grad;
+	cv::Mat abs_grad_x, abs_grad_y;
+
+        // Gradient X
+	cv::Sobel( imgDilate, grad_x, CV_8U, 1, 0);
+	cv::convertScaleAbs( grad_x, abs_grad_x );
+
+	// Gradient Y
+	cv::Sobel( imgDilate, grad_y, CV_8U, 0, 1);
+	cv::convertScaleAbs( grad_y, abs_grad_y );
+	   
+	// Total Gradient (approximate)
+	cv::addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad );
 
 	// ------------------------------------------
 	// End Execution time
