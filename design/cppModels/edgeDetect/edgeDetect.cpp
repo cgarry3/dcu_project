@@ -59,7 +59,20 @@ int main()
 	// Edge Detection
 	// ------------------------------------------
 
-        cv::Sobel(imgDilate,imgEdges, CV_8U, 1, 0);
+	// Storage
+	cv::Mat grad_x, grad_y;
+	cv::Mat abs_grad_x, abs_grad_y;
+
+        // Gradient X
+	cv::Sobel( imgDilate, grad_x, CV_8U, 1, 0);
+	cv::convertScaleAbs( grad_x, abs_grad_x );
+
+	// Gradient Y
+	cv::Sobel( imgDilate, grad_y, CV_8U, 0, 1);
+	cv::convertScaleAbs( grad_y, abs_grad_y );
+	   
+	// Total Gradient (approximate)
+	cv::addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, imgEdges );
 
 	// ------------------------------------------
 	// End Execution time
